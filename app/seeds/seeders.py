@@ -1,20 +1,27 @@
 from app.models import db, User, environment, SCHEMA
 from sqlalchemy.sql import text
+from werkzeug.security import generate_password_hash
 
 
 # Adds a demo user, you can add other users here if you want
-def seed_users():
-    demo = User(
-        username='Demo', email='demo@aa.io', password='password')
-    marnie = User(
-        username='marnie', email='marnie@aa.io', password='password')
-    bobbie = User(
-        username='bobbie', email='bobbie@aa.io', password='password')
+def create_seeder():
 
-    db.session.add(demo)
-    db.session.add(marnie)
-    db.session.add(bobbie)
+    ## SEED USERS
+    user_list = [
+        {'username':'Demo', 'email':'demo@aa.io', 'buying_power': 10000, 'password':generate_password_hash("password")}
+    ]
+
+    for user_data in user_list:
+        user = User(
+            username=user_data['username'],
+            email=user_data['email'],
+            buying_power=user_data['buying_power'],
+            hashed_password=user_data['password'],
+        )
+        db.session.add(user)
     db.session.commit()
+
+
 
 
 # Uses a raw SQL query to TRUNCATE or DELETE the users table. SQLAlchemy doesn't
