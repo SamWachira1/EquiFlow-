@@ -1,3 +1,3 @@
 from .db import db
-from .user import User
+from .models import User, Security, Holding, Transaction, Watchlist, WatchlistSecurity
 from .db import environment, SCHEMA
