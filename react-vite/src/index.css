@@ -1,1 +1,35 @@
 /* TODO: Add sitewide styles */
+/* TODO: Add sitewide styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  #root {
+    color: black;
+    height: 100vh;
+  }
+  
+  body {
+    font-family: "Montserrat", Inter, Arial, Helvetica, sans-serif;
+    background-color: white;
+  }
+  
+  
+  a {
+    text-decoration: none;
+  }
+  
+  button,
+  input[type="submit"],
+  input[type="reset"] {
+    background: none;
+    color: inherit;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+    outline: inherit;
+  }
+  
