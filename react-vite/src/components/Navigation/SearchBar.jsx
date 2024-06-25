@@ -7,52 +7,48 @@ import { fetchSearchResults } from '../../redux/search';
 
 function SearchBar() {
   const [query, setQuery] = useState('');
-    const dispatch = useDispatch();
-    const { results, loading, error } = useSelector((state) => state.search);
-    const user = useSelector((state) => state.session.user);
+  const dispatch = useDispatch();
+  const { results, loading, error } = useSelector((state) => state.search);
+  const user = useSelector((state) => state.session.user);
 
-    useEffect(() => {
-        if (query) {
-            const timeoutId = setTimeout(() => {
-                dispatch(fetchSearchResults(query));
-            }, 500);
-            return () => clearTimeout(timeoutId);
-        }
-    }, [query, dispatch]);
+  useEffect(() => {
+      if (query) {
+          const timeoutId = setTimeout(() => {
+              dispatch(fetchSearchResults(query));
+          }, 500);
+          return () => clearTimeout(timeoutId);
+      }
+  }, [query, dispatch]);
 
-    const handleSearchChange = (e) => {
-        setQuery(e.target.value);
-    };
-  
-    const resultArray = results[query] ?? [];
+  const handleSearchChange = (e) => {
+      setQuery(e.target.value);
+  };
 
-    console.log(resultArray)
-
-    return (
-        user ? (
-            <div className={styles.searchContainer}>
-                <FaSearch className={styles.searchIcon} />
-                <input
-                    type="text"
-                    className={styles.searchInput}
-                    placeholder="Search"
-                    value={query}
-                    onChange={handleSearchChange}
-                />
-                {loading && <p>Loading...</p>}
-                {error && <p>{error}</p>}
-                {resultArray?.length > 0 && (
-                    <ul className={styles.searchResults}>
-                        {resultArray.map((result, index) => (
-                            <li key={index} className={styles.searchResultItem}>
-                                {result.name || result.ticker}
-                            </li>
-                        ))}
-                    </ul>
-                )}
-            </div>
-        ) : null
-    );
+  return (
+      user ? (
+          <div className={styles.searchContainer}>
+              <FaSearch className={styles.searchIcon} />
+              <input
+                  type="text"
+                  className={styles.searchInput}
+                  placeholder="Search"
+                  value={query}
+                  onChange={handleSearchChange}
+              />
+              {loading && <p>Loading...</p>}
+              {error && <p>{error}</p>}
+              {query && results.length > 0 && (
+                  <ul className={styles.searchResults}>
+                      {results.map((result, index) => (
+                          <li key={index} className={styles.searchResultItem}>
+                              {result.name} ({result.symbol})
+                          </li>
+                      ))}
+                  </ul>
+              )}
+          </div>
+      ) : null
+  );
 }
 
 export default SearchBar;
