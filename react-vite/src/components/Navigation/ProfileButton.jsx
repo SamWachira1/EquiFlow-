@@ -15,21 +15,25 @@ function ProfileButton() {
   };
 
   return (
-    <div className={styles.profileButtons}>
+    <div className={styles.profileButtonContainer}>
       {user ? (
         <button className={styles.button} onClick={logout}>Log Out</button>
       ) : (
         <>
-          <OpenModalMenuItem
-            itemText="Log In"
-            modalComponent={<LoginFormModal />}
-            className={styles.button}
-          />
-          <OpenModalMenuItem
-            itemText="Sign Up"
-            modalComponent={<SignupFormModal />}
-            className={styles.button}
-          />
+          <div className={styles.buttonWrapper}>
+            <OpenModalMenuItem
+              itemText="Log In"
+              modalComponent={<LoginFormModal />}
+              className={styles.button}
+            />
+          </div>
+          <div className={styles.buttonWrapper}>
+            <OpenModalMenuItem
+              itemText="Sign Up"
+              modalComponent={<SignupFormModal />}
+              className={styles.button}
+            />
+          </div>
         </>
       )}
     </div>

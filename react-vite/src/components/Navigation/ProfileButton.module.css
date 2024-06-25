@@ -1,18 +1,24 @@
-.profileButtons {
-    display: flex;
-    gap: 10px; /* Space between buttons */
-  }
-  
-  .button {
-    text-decoration: none;
-    color: white;
-    background-color: #007bff;
-    padding: 8px 16px;
-    border-radius: 4px;
-    font-weight: bold;
-  }
-  
-  .button:hover {
-    background-color: #0056b3;
-  }
-  
+/* ProfileButton.module.css */
+.profileButtonContainer {
+  display: flex;
+  align-items: center;
+}
+
+.button {
+  margin: 0 10px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 3px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.button:hover {
+  background-color: #0056b3;
+}
+
+.buttonWrapper {
+  margin: 0 10px;
+}
