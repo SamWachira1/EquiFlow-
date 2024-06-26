@@ -7,10 +7,12 @@ import {
 import thunk from "redux-thunk";
 import sessionReducer from "./session";
 import searchReducer from "./search";
+import securitiesReducer from "./securities";
 
 const rootReducer = combineReducers({
   session: sessionReducer,
-  search: searchReducer
+  search: searchReducer,
+  securities: securitiesReducer
 
 });
 

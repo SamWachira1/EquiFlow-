@@ -1,5 +1,7 @@
 from flask import Blueprint, request, jsonify
 from app.models import Security, db
+from flask_login import login_required
+
 import requests
 import os 
 
@@ -16,6 +18,7 @@ TINGO_API_KEY= os.getenv('TINGO_API_KEY')
 
 
 @search_routes.route('/', methods=['GET'])
+# @login_required
 def search_security():
     query = request.args.get('query')
     if not query:

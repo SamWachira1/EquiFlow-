@@ -1,0 +1,85 @@
+/* SecuritiesPage.module.css */
+
+.securitiesPage {
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  
+  .header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .header h1 {
+    font-size: 2em;
+    margin: 0;
+  }
+  
+  .header p {
+    margin: 5px 0;
+  }
+  
+  .change {
+    color: green;
+    font-weight: bold;
+  }
+  
+  .changePercent {
+    color: green;
+    font-weight: bold;
+  }
+  
+  .orderSection {
+    margin-top: 20px;
+  }
+  
+  .orderSection h2 {
+    font-size: 1.5em;
+  }
+  
+  .orderSection form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .orderSection form label {
+    font-weight: bold;
+  }
+  
+  .orderSection form select,
+  .orderSection form input {
+    padding: 10px;
+    font-size: 1em;
+  }
+  
+  .orderSection form button {
+    padding: 10px;
+    font-size: 1em;
+    background-color: green;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .additionalInfo {
+    margin-top: 20px;
+  }
+  
+  .additionalInfo h2 {
+    font-size: 1.5em;
+  }
+  
+  .additionalInfo p {
+    margin: 10px 0;
+  }
+  
+  .additionalInfo ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .additionalInfo ul li {
+    margin: 5px 0;
+  }
