@@ -14,7 +14,7 @@ const action = (type, payload) => ({
 export const fetchSearchResults = (query) => async (dispatch) => {
   dispatch(action(FETCH_SEARCH_RESULTS_REQUEST));
   try {
-    const response = await fetch(`http://127.0.0.1:8000/api/search?query=${query}`);
+    const response = await fetch(`/api/search?query=${query}`);
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
