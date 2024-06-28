@@ -1,85 +1,134 @@
-/* SecuritiesPage.module.css */
-
 .securitiesPage {
-    width: 100%;
-    padding: 20px;
-    box-sizing: border-box;
-  }
-  
-  .header {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  .header h1 {
-    font-size: 2em;
-    margin: 0;
-  }
-  
-  .header p {
-    margin: 5px 0;
-  }
-  
-  .change {
-    color: green;
-    font-weight: bold;
-  }
-  
-  .changePercent {
-    color: green;
-    font-weight: bold;
-  }
-  
-  .orderSection {
-    margin-top: 20px;
-  }
-  
-  .orderSection h2 {
-    font-size: 1.5em;
-  }
-  
-  .orderSection form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .orderSection form label {
-    font-weight: bold;
-  }
-  
-  .orderSection form select,
-  .orderSection form input {
-    padding: 10px;
-    font-size: 1em;
-  }
-  
-  .orderSection form button {
-    padding: 10px;
-    font-size: 1em;
-    background-color: green;
-    color: white;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .additionalInfo {
-    margin-top: 20px;
-  }
-  
-  .additionalInfo h2 {
-    font-size: 1.5em;
-  }
-  
-  .additionalInfo p {
-    margin: 10px 0;
-  }
-  
-  .additionalInfo ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  .additionalInfo ul li {
-    margin: 5px 0;
-  }
+  display: flex;
+  padding: 20px;
+}
+
+.leftColumn {
+  flex: 0 0 70%;
+  padding-right: 20px;
+}
+
+.rightColumn {
+  flex: 0 0 30%;
+  padding-left: 20px;
+  border-left: 1px solid #e0e0e0;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.header h1 {
+  font-size: 2.5em;
+  margin: 0;
+}
+
+.header p {
+  margin: 5px 0;
+}
+
+.change {
+  color: green;
+  font-weight: bold;
+}
+
+.changePercent {
+  color: green;
+  font-weight: bold;
+}
+
+.periodButtons {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.periodButtons button {
+  background-color: #f1f1f1;
+  border: none;
+  padding: 10px 20px;
+  margin: 0 10px;
+  cursor: pointer;
+  font-size: 1em;
+}
+
+.periodButtons button:hover {
+  background-color: #ddd;
+}
+
+
+.orderSection {
+  margin-bottom: 20px;
+}
+
+.orderSection h2 {
+  font-size: 1.5em;
+  margin-bottom: 10px;
+}
+
+.orderSection form {
+  display: flex;
+  flex-direction: column;
+}
+
+.orderSection form label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.orderSection form select,
+.orderSection form input {
+  padding: 10px;
+  font-size: 1em;
+  margin-bottom: 10px;
+}
+
+.orderSection form button {
+  padding: 10px;
+  font-size: 1em;
+  background-color: green;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.watchlist {
+  display: flex;
+  justify-content: center;
+}
+
+.watchlist button {
+  padding: 10px 20px;
+  font-size: 1em;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.watchlist button:hover {
+  background-color: #0056b3;
+}
+
+.additionalInfo {
+  margin-top: 20px;
+}
+
+.additionalInfo h2 {
+  font-size: 1.5em;
+  margin-bottom: 10px;
+}
+
+.additionalInfo p {
+  margin: 10px 0;
+}
+
+.additionalInfo ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.additionalInfo ul li {
+  margin: 5px 0;
+}

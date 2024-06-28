@@ -1,18 +1,40 @@
-from flask import Blueprint, request, jsonify
-from app.models import Security, db
-from flask_login import login_required
-from datetime import datetime
-
+from flask import Blueprint, jsonify
+from datetime import datetime, timedelta
 import requests
-import os 
+import os
 
 STOCKDATAORG_API_KEY = os.getenv('STOCKDATAORG_API_KEY')
 
 securities_routes = Blueprint('securities', __name__)
 
+def fetch_data(symbol, date_from, date_to, interval='minute'):
+    try:
+        response = requests.get(
+            f'https://api.stockdata.org/v1/data/intraday/adjusted?symbols={symbol}&api_token={STOCKDATAORG_API_KEY}&date_from={date_from}&date_to={date_to}&interval={interval}'
+        )
+    
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        return jsonify({'error': str(e)}), 500
+
+@securities_routes.route('/historical/1d/<symbol>', methods=['GET'])
+def get_1d_data(symbol):
+    today = datetime.now()
+    yesterday = today - timedelta(days=1)
+    date_from = yesterday.strftime('%Y-%m-%d')
+    date_to = today.strftime('%Y-%m-%d')
+    return fetch_data(symbol, date_from, date_to, interval='minute')
+
+@securities_routes.route('/historical/1w/<symbol>', methods=['GET'])
+def get_1w_data(symbol):
+    today = datetime.now()
+    six_days_ago = today - timedelta(days=6)
+    date_from = six_days_ago.strftime('%Y-%m-%d')
+    date_to = today.strftime('%Y-%m-%d')
+    return fetch_data(symbol, date_from, date_to, interval='hour')
 
 @securities_routes.route('/<symbol>', methods=['GET'])
-@login_required
 def get_stock(symbol):
     try:
         # Fetch stock data from StockData API
@@ -56,23 +78,4 @@ def get_stock(symbol):
         return jsonify({'error': 'Failed to fetch stock data'}), 500
     except Exception as e:
         print(f"Error: {e}")
-        return jsonify({'error': str(e)}), 500
-
-@securities_routes.route('/historical/<symbol>', methods=['GET'])
-def get_historical_data(symbol):
-    today = datetime.now()
-    five_years_ago = today.replace(year=today.year - 5)
-    date_from = five_years_ago.strftime('%Y-%m-%d')
-    date_to = today.strftime('%Y-%m-%d')
-
-    try:
-        response = requests.get(
-            f'https://api.stockdata.org/v1/data/intraday/adjusted?symbols={symbol}&api_token={STOCKDATAORG_API_KEY}&date_from={date_from}&date_to={date_to}'
-        )
-        if response.status_code != 200:
-            return jsonify({'error': 'Failed to fetch historical data'}), response.status_code
-        
-        data = response.json()
-        return data
-    except Exception as e:
         return jsonify({'error': str(e)}), 500
