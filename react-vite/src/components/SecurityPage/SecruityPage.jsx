@@ -75,7 +75,6 @@ const SecuritiesPage = () => {
             <h1>{general.Name}</h1>
             <p>${closePrice}</p>
             <p>{changePercentage}%</p>
-            <p>{general.CurrencySymbol}{general.CurrencyCode}</p>
           </div>
           <div className={styles.chartContainer}>
             <RechartsAreaChart data={historicalData[period]} />
