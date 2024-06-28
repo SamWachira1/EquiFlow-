@@ -3,11 +3,16 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 import styles from './Recharts.module.css';
 
 const RechartsAreaChart = ({ data }) => {
+  // Ensure data is an array
+  if (!Array.isArray(data) || data.length === 0) {
+    return <p>No data available</p>;
+  }
+
   // Sort data by date in ascending order
   const formattedData = data
     .map(d => ({
-      date: new Date(d.date).toLocaleString(),
-      close: d.data.close,
+      date: new Date(d.date).toLocaleDateString(), // Convert date to locale date string
+      close: d.close,
     }))
     .sort((a, b) => new Date(a.date) - new Date(b.date)); // Sort by date
 
@@ -21,7 +26,7 @@ const RechartsAreaChart = ({ data }) => {
               <stop offset="95%" stopColor="#84d884" stopOpacity={0} />
             </linearGradient>
           </defs>
-          <XAxis dataKey="date" tickFormatter={(tick) => tick.split(', ')[1]} hide={true} axisLine={{ stroke: '#d3d3d3' }} tickLine={false} />
+          <XAxis dataKey="date" tickFormatter={(tick) => tick.split('/')[1]} hide={true} axisLine={{ stroke: '#d3d3d3' }} tickLine={false} />
           <YAxis domain={['auto', 'auto']} hide={true} axisLine={{ stroke: '#d3d3d3' }} tickLine={false} />
           <Tooltip />
           <Area type="monotone" dataKey="close" stroke="#84d884" fillOpacity={1} fill="url(#colorClose)" />

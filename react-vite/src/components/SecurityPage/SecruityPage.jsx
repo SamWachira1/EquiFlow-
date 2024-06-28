@@ -1,8 +1,18 @@
-// src/components/SecurityPage/SecuritiesPage.jsx
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchSecuritiesData, fetchHistoricalData1D, fetchHistoricalData1W } from '../../redux/securities';
+import {
+  fetchHistoricalData1D,
+  fetchHistoricalData1W,
+  fetchHistoricalData1M,
+  fetchHistoricalData3M,
+  fetchHistoricalDataYTD,
+  fetchHistoricalData1Y,
+  fetchHistoricalData5Y,
+  fetchFundamentalData,
+  clearHistoricalData,
+  clearFundamentalData
+} from '../../redux/securities';
 import RechartsAreaChart from '../Recharts';
 import styles from './SecuritiesPage.module.css';
 
@@ -11,12 +21,17 @@ const SecuritiesPage = () => {
   const dispatch = useDispatch();
   const [period, setPeriod] = useState('1d');
 
-  const { securitiesInfo, historicalData } = useSelector((state) => state.securities);
+  const { historicalData, fundamentalData } = useSelector((state) => state.securities);
   const { user } = useSelector((state) => state.session);
 
   useEffect(() => {
-    dispatch(fetchSecuritiesData(symbol));
     dispatch(fetchHistoricalData1D(symbol)); // Fetch 1D data by default
+    dispatch(fetchFundamentalData(symbol));
+
+    return () => {
+      dispatch(clearHistoricalData());
+      dispatch(clearFundamentalData());
+    };
   }, [symbol, dispatch]);
 
   useEffect(() => {
@@ -24,52 +39,66 @@ const SecuritiesPage = () => {
       dispatch(fetchHistoricalData1D(symbol));
     } else if (period === '1w') {
       dispatch(fetchHistoricalData1W(symbol));
+    } else if (period === '1m') {
+      dispatch(fetchHistoricalData1M(symbol));
+    } else if (period === '3m') {
+      dispatch(fetchHistoricalData3M(symbol));
+    } else if (period === 'ytd') {
+      dispatch(fetchHistoricalDataYTD(symbol));
+    } else if (period === '1y') {
+      dispatch(fetchHistoricalData1Y(symbol));
+    } else if (period === '5y') {
+      dispatch(fetchHistoricalData5Y(symbol));
     }
   }, [period, dispatch, symbol]);
+
+  const general = fundamentalData.General || {};
+  const technicals = fundamentalData.Technicals || {};
 
   return (
     user ? (
       <div className={styles.securitiesPage}>
         <div className={styles.leftColumn}>
           <div className={styles.header}>
-            <h1>{securitiesInfo.name}</h1>
-            <p>{securitiesInfo.price} USD</p>
-            <p className={styles.change}>
-              {securitiesInfo.day_change > 0 ? '+' : ''}{securitiesInfo.day_change} USD
-            </p>
-            <p className={styles.changePercent}>
-              {securitiesInfo.change_percent > 0 ? '+' : ''}{securitiesInfo.change_percent}%
-            </p>
+            <h1>{general.Name}</h1>
+            <p>{general.CurrencySymbol}{general.CurrencyCode}</p>
           </div>
           <div className={styles.periodButtons}>
             <button onClick={() => setPeriod('1d')}>1D</button>
             <button onClick={() => setPeriod('1w')}>1W</button>
+            <button onClick={() => setPeriod('1m')}>1M</button>
+            <button onClick={() => setPeriod('3m')}>3M</button>
+            <button onClick={() => setPeriod('ytd')}>YTD</button>
+            <button onClick={() => setPeriod('1y')}>1Y</button>
+            <button onClick={() => setPeriod('5y')}>5Y</button>
           </div>
           <div className={styles.chartContainer}>
-            <RechartsAreaChart data={historicalData} />
+            <RechartsAreaChart data={historicalData[period]} />
           </div>
           <div className={styles.additionalInfo}>
-            <h2>About {securitiesInfo.name}</h2>
-            <p>{securitiesInfo.description}</p>
+            <h2>About {general.Name}</h2>
+            <p>{general.Description}</p>
             <h2>Key Statistics</h2>
             <ul>
-              <li>Industry: {securitiesInfo.industry}</li>
-              <li>Exchange: {securitiesInfo.exchange_long}</li>
-              <li>Country: {securitiesInfo.country}</li>
-              <li>Market Cap: {securitiesInfo.market_cap}</li>
-              <li>52-Week High: {securitiesInfo['52_week_high']}</li>
-              <li>52-Week Low: {securitiesInfo['52_week_low']}</li>
-              <li>Day High: {securitiesInfo.day_high}</li>
-              <li>Day Low: {securitiesInfo.day_low}</li>
-              <li>Day Open: {securitiesInfo.day_open}</li>
-              <li>Volume: {securitiesInfo.volume}</li>
-              <li>Last Trade Time: {new Date(securitiesInfo.last_trade_time).toLocaleString()}</li>
+              <li>Industry: {general.Category}</li>
+              <li>Exchange: {general.Exchange}</li>
+              <li>Country: {general.CountryName}</li>
+              <li>Market Cap: {general.MarketCap}</li>
+              <li>52-Week High: {technicals['52WeekHigh']}</li>
+              <li>52-Week Low: {technicals['52WeekLow']}</li>
+              <li>Day High: {technicals['DayHigh']}</li>
+              <li>Day Low: {technicals['DayLow']}</li>
+              <li>Day Open: {technicals['DayOpen']}</li>
+              <li>Volume: {technicals.Volume}</li>
+              <li>Beta: {technicals.Beta}</li>
+              <li>50-Day Moving Average: {technicals['50DayMA']}</li>
+              <li>200-Day Moving Average: {technicals['200DayMA']}</li>
             </ul>
           </div>
         </div>
         <div className={styles.rightColumn}>
           <div className={styles.orderSection}>
-            <h2>Buy {securitiesInfo.name}</h2>
+            <h2>Buy {general.Name}</h2>
             <form>
               <label>Order Type</label>
               <select>
