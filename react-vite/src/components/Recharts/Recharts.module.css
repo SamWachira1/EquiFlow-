@@ -1,1 +1,15 @@
-
+.chartContainer {
+    position: relative;
+    width: 100%;
+    height: 400px;
+  }
+  
+  .chartContainer::after {
+    content: '';
+    position: absolute;
+    background: #d3d3d3;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 1px;
+  }
