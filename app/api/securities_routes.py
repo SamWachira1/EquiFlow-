@@ -32,7 +32,7 @@ def get_1w_data(symbol):
     six_days_ago = today - timedelta(days=6)
     date_from = six_days_ago.strftime('%Y-%m-%d')
     date_to = today.strftime('%Y-%m-%d')
-    return fetch_data(symbol, date_from, date_to, interval='hour')
+    return fetch_data(symbol, date_from, date_to, interval='minute')
 
 @securities_routes.route('/<symbol>', methods=['GET'])
 def get_stock(symbol):
