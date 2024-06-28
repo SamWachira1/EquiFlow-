@@ -34,6 +34,15 @@ def fetch_fundamental_data(symbol):
     except requests.exceptions.RequestException as e:
         return jsonify({'error': str(e)}), 500
 
+def fetch_real_time_data(symbol):
+    try:
+        url = f'https://eodhd.com/api/real-time/{symbol}?api_token={EODHD_API_KEY}&fmt=json'
+        response = requests.get(url)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        return jsonify({'error': str(e)}), 500
+
 @securities_routes.route('/historical/1d/<symbol>', methods=['GET'])
 def get_1d_data(symbol):
     today = datetime.now()
@@ -80,3 +89,7 @@ def get_5y_data(symbol):
 @securities_routes.route('/fundamentals/<symbol>', methods=['GET'])
 def get_fundamentals(symbol):
     return fetch_fundamental_data(symbol)
+
+@securities_routes.route('/real-time/<symbol>', methods=['GET'])
+def get_real_time(symbol):
+    return fetch_real_time_data(symbol)

@@ -3,8 +3,10 @@
 // Action Types
 const GET_HISTORICAL_DATA = 'securities/getHistoricalData';
 const GET_FUNDAMENTAL_DATA = 'securities/getFundamentalData';
+const GET_REAL_TIME_DATA = 'securities/getRealTimeData';
 const CLEAR_HISTORICAL_DATA = 'securities/clearHistoricalData';
 const CLEAR_FUNDAMENTAL_DATA = 'securities/clearFundamentalData';
+const CLEAR_REAL_TIME_DATA = 'securities/clearRealTimeData';
 const FETCH_SECURITIES_DATA_FAILURE = 'securities/fetchSecuritiesDataFailure';
 
 // Action Creator
@@ -119,12 +121,29 @@ export const fetchFundamentalData = (symbol) => async (dispatch) => {
   }
 };
 
+export const fetchRealTimeData = (symbol) => async (dispatch) => {
+  try {
+    const response = await fetch(`/api/securities/real-time/${symbol}`);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const data = await response.json();
+    dispatch(action(GET_REAL_TIME_DATA, data));
+  } catch (error) {
+    dispatch(action(FETCH_SECURITIES_DATA_FAILURE, error.message));
+  }
+};
+
 export const clearHistoricalData = () => async (dispatch) => {
   dispatch(action(CLEAR_HISTORICAL_DATA));
 };
 
 export const clearFundamentalData = () => async (dispatch) => {
   dispatch(action(CLEAR_FUNDAMENTAL_DATA));
+};
+
+export const clearRealTimeData = () => async (dispatch) => {
+  dispatch(action(CLEAR_REAL_TIME_DATA));
 };
 // Reducer
 const initialState = {
@@ -161,6 +180,13 @@ const securitiesReducer = (state = initialState, action) => {
         error: null,
       };
     }
+    case GET_REAL_TIME_DATA: {
+      return {
+        ...state,
+        realTimeData: action.payload,
+        error: null,
+      };
+    }
     case CLEAR_HISTORICAL_DATA: {
       return {
         ...state,
@@ -181,6 +207,13 @@ const securitiesReducer = (state = initialState, action) => {
         fundamentalData: {},
       };
     }
+    case CLEAR_REAL_TIME_DATA: {
+      return {
+        ...state,
+        realTimeData: {},
+      };
+    }
+    
     case FETCH_SECURITIES_DATA_FAILURE: {
       return {
         ...state,

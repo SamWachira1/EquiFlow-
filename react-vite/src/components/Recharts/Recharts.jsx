@@ -3,10 +3,6 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 import styles from './Recharts.module.css';
 
 const RechartsAreaChart = ({ data }) => {
-  // Ensure data is an array
-  if (!Array.isArray(data) || data.length === 0) {
-    return <p>No data available</p>;
-  }
 
   // Sort data by date in ascending order
   const formattedData = data
