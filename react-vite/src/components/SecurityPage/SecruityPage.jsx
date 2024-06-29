@@ -16,20 +16,28 @@ import {
   clearRealTimeData,
 } from '../../redux/securities';
 import RechartsAreaChart from '../Recharts';
+import LoadingSpinner from '../LoadingSpinner';
 import styles from './SecuritiesPage.module.css';
 
 const SecuritiesPage = () => {
   const { symbol } = useParams();
   const dispatch = useDispatch();
   const [period, setPeriod] = useState('1d');
+  const [loadingChart, setLoadingChart] = useState(true);
 
   const { historicalData, fundamentalData, realTimeData } = useSelector((state) => state.securities);
   const { user } = useSelector((state) => state.session);
 
   useEffect(() => {
-    dispatch(fetchHistoricalData1D(symbol)); // Fetch 1D data by default
-    dispatch(fetchFundamentalData(symbol));
-    dispatch(fetchRealTimeData(symbol));
+    const fetchData = async () => {
+      setLoadingChart(true);
+      await dispatch(fetchHistoricalData1D(symbol)); // Fetch 1D data by default
+      await dispatch(fetchFundamentalData(symbol));
+      await dispatch(fetchRealTimeData(symbol));
+      setLoadingChart(false);
+    };
+
+    fetchData();
 
     return () => {
       dispatch(clearHistoricalData());
@@ -39,21 +47,27 @@ const SecuritiesPage = () => {
   }, [symbol, dispatch]);
 
   useEffect(() => {
-    if (period === '1d') {
-      dispatch(fetchHistoricalData1D(symbol));
-    } else if (period === '1w') {
-      dispatch(fetchHistoricalData1W(symbol));
-    } else if (period === '1m') {
-      dispatch(fetchHistoricalData1M(symbol));
-    } else if (period === '3m') {
-      dispatch(fetchHistoricalData3M(symbol));
-    } else if (period === 'ytd') {
-      dispatch(fetchHistoricalDataYTD(symbol));
-    } else if (period === '1y') {
-      dispatch(fetchHistoricalData1Y(symbol));
-    } else if (period === '5y') {
-      dispatch(fetchHistoricalData5Y(symbol));
-    }
+    const fetchData = async () => {
+      setLoadingChart(true);
+      if (period === '1d') {
+        await dispatch(fetchHistoricalData1D(symbol));
+      } else if (period === '1w') {
+        await dispatch(fetchHistoricalData1W(symbol));
+      } else if (period === '1m') {
+        await dispatch(fetchHistoricalData1M(symbol));
+      } else if (period === '3m') {
+        await dispatch(fetchHistoricalData3M(symbol));
+      } else if (period === 'ytd') {
+        await dispatch(fetchHistoricalDataYTD(symbol));
+      } else if (period === '1y') {
+        await dispatch(fetchHistoricalData1Y(symbol));
+      } else if (period === '5y') {
+        await dispatch(fetchHistoricalData5Y(symbol));
+      }
+      setLoadingChart(false);
+    };
+
+    fetchData();
   }, [period, dispatch, symbol]);
 
   const general = fundamentalData.General || {};
@@ -77,16 +91,16 @@ const SecuritiesPage = () => {
             <p>{changePercentage}%</p>
           </div>
           <div className={styles.chartContainer}>
-            <RechartsAreaChart data={historicalData[period]} />
+            {loadingChart ? <LoadingSpinner /> : <RechartsAreaChart data={historicalData[period]} />}
           </div>
           <div className={styles.periodButtons}>
-            <button onClick={() => setPeriod('1d')}>1D</button>
-            <button onClick={() => setPeriod('1w')}>1W</button>
-            <button onClick={() => setPeriod('1m')}>1M</button>
-            <button onClick={() => setPeriod('3m')}>3M</button>
-            <button onClick={() => setPeriod('ytd')}>YTD</button>
-            <button onClick={() => setPeriod('1y')}>1Y</button>
-            <button onClick={() => setPeriod('5y')}>5Y</button>
+            <button onClick={() => setPeriod('1d')} disabled={loadingChart}>{loadingChart && period === '1d' ? 'Loading...' : '1D'}</button>
+            <button onClick={() => setPeriod('1w')} disabled={loadingChart}>{loadingChart && period === '1w' ? 'Loading...' : '1W'}</button>
+            <button onClick={() => setPeriod('1m')} disabled={loadingChart}>{loadingChart && period === '1m' ? 'Loading...' : '1M'}</button>
+            <button onClick={() => setPeriod('3m')} disabled={loadingChart}>{loadingChart && period === '3m' ? 'Loading...' : '3M'}</button>
+            <button onClick={() => setPeriod('ytd')} disabled={loadingChart}>{loadingChart && period === 'ytd' ? 'Loading...' : 'YTD'}</button>
+            <button onClick={() => setPeriod('1y')} disabled={loadingChart}>{loadingChart && period === '1y' ? 'Loading...' : '1Y'}</button>
+            <button onClick={() => setPeriod('5y')} disabled={loadingChart}>{loadingChart && period === '5y' ? 'Loading...' : '5Y'}</button>
           </div>
           <div className={styles.additionalInfo}>
             <h2>About {general.Name}</h2>
