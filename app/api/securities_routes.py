@@ -2,12 +2,14 @@ from flask import Blueprint, jsonify
 from datetime import datetime, timedelta
 import requests
 import os
+import io
+import csv
 
 EODHD_API_KEY = os.getenv('EODHD_API_KEY')
 
 securities_routes = Blueprint('securities', __name__)
 
-def fetch_yahoo_style_data(symbol, from_date, to_date, period='d'):
+def fetch_yahoo_style_data(symbol, from_date, to_date, period='d', interval=None):
     try:
         a = from_date.month - 1
         b = from_date.day
@@ -16,13 +18,26 @@ def fetch_yahoo_style_data(symbol, from_date, to_date, period='d'):
         e = to_date.day
         f = to_date.year
 
-        url = f'https://eodhd.com/api/table.csv?s={symbol}&a={a:02d}&b={b:02d}&c={c}&d={d:02d}&e={e:02d}&f={f}&g={period}&api_token={EODHD_API_KEY}&fmt=json'
+        if interval:
+            url = f'https://eodhd.com/api/intraday/{symbol}?interval={interval}&api_token={EODHD_API_KEY}&fmt=csv'
+        else:
+            url = f'https://eodhd.com/api/table.csv?s={symbol}&a={a:02d}&b={b:02d}&c={c}&d={d:02d}&e={e:02d}&f={f}&g={period}&api_token={EODHD_API_KEY}&fmt=json'
+        
         response = requests.get(url)
         response.raise_for_status()
-        return response.json()
+
+        if interval:
+            # Parse CSV data
+            csv_file = io.StringIO(response.text)
+            reader = csv.DictReader(csv_file)
+            data = [row for row in reader]
+            last_trading_day = from_date.date()
+            filtered_data = [d for d in data if datetime.strptime(d['Datetime'], "%Y-%m-%d %H:%M:%S").date() == last_trading_day]
+            return jsonify(filtered_data)
+        else:
+            return response.json()
     except requests.exceptions.RequestException as e:
         return jsonify({'error': str(e)}), 500
-
 
 def fetch_fundamental_data(symbol):
     try:
@@ -47,7 +62,7 @@ def fetch_real_time_data(symbol):
 def get_1d_data(symbol):
     today = datetime.now()
     yesterday = today - timedelta(days=1)
-    return fetch_yahoo_style_data(symbol, yesterday, today)
+    return fetch_yahoo_style_data(symbol, yesterday, today, period='d', interval='1m')
 
 @securities_routes.route('/historical/1w/<symbol>', methods=['GET'])
 def get_1w_data(symbol):

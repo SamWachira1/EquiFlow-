@@ -3,14 +3,30 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 import styles from './Recharts.module.css';
 
 const RechartsAreaChart = ({ data }) => {
-
-  // Sort data by date in ascending order
-  const formattedData = data
-    .map(d => ({
-      date: new Date(d.date).toLocaleDateString(), // Convert date to locale date string
-      close: d.close,
-    }))
-    .sort((a, b) => new Date(a.date) - new Date(b.date)); // Sort by date
+    const formatDate = (d) => {
+        if (d.Datetime) {
+          return new Date(d.Datetime).toLocaleString();
+        } else if (d.date) {
+          return new Date(d.date).toLocaleDateString();
+        }
+        return new Date(d.timestamp * 1000).toLocaleString();
+      };
+    
+      // Helper function to get close price
+      const getClosePrice = (d) => {
+        if (d.close) {
+          return parseFloat(d.close);
+        }
+        return parseFloat(d.Close);
+      };
+    
+      // Sort data by timestamp or date in ascending order and format the data correctly
+      const formattedData = data
+        .map(d => ({
+          date: formatDate(d), // Convert to locale date-time string
+          close: getClosePrice(d), // Parse close price
+        }))
+        .sort((a, b) => new Date(a.date) - new Date(b.date)); // Sort by date
 
   return (
     <div className={styles.chartContainer}>
