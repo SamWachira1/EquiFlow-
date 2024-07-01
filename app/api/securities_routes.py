@@ -19,7 +19,7 @@ def fetch_yahoo_style_data(symbol, from_date, to_date, period='d', interval=None
         f = to_date.year
 
         if interval:
-            url = f'https://eodhd.com/api/intraday/{symbol}?interval={interval}&api_token={EODHD_API_KEY}&fmt=csv'
+            url = f'https://eodhd.com/api/intraday/{symbol}.US?interval={interval}&api_token={EODHD_API_KEY}&fmt=csv'
         else:
             url = f'https://eodhd.com/api/table.csv?s={symbol}&a={a:02d}&b={b:02d}&c={c}&d={d:02d}&e={e:02d}&f={f}&g={period}&api_token={EODHD_API_KEY}&fmt=json'
         

@@ -7,18 +7,9 @@ import os
 
 search_routes = Blueprint('search', __name__)
 
-
-ALPHA_VANTAGE_API_KEY = os.getenv('ALPHA_VANTAGE_API_KEY')
-FINNHUB_API_KEY = os.getenv('FINNHUB_API_KEY')
-STOCKDATAORG_API_KEY = os.getenv('STOCKDATAORG_API_KEY')
-FMP_API_KEY = os.getenv('FMP_API_KEY')
-TINGO_API_KEY= os.getenv('TINGO_API_KEY')
-
-
-
+EODHD_API_KEY=os.getenv('EODHD_API_KEY')
 
 @search_routes.route('/', methods=['GET'])
-# @login_required
 def search_security():
     query = request.args.get('query')
     if not query:
@@ -37,16 +28,16 @@ def search_security():
         if suggestions:
             return jsonify(suggestions)
 
-        # Fallback to StockData API if no results found locally
-        stock_data_org = requests.get(
-            f'https://api.stockdata.org/v1/entity/search?search={query}&api_token={STOCKDATAORG_API_KEY}'
-        )
-        api_response = stock_data_org.json()
-        api_results = api_response.get('data', [])
-
-        for result in api_results:
-            name = result.get('name')
-            symbol = result.get('symbol')
+        # Fallback to EODHD search API if no results found locally
+        url = f'https://eodhd.com/api/search/{query}?api_token={EODHD_API_KEY}&fmt=json'
+        response = requests.get(url)
+        response.raise_for_status()
+        api_response = response.json()
+        
+        # Extract relevant data from the API response
+        for result in api_response:
+            name = result.get('Name')
+            symbol = result.get('Code')
             if name and symbol:
                 suggestions.append({'name': name, 'symbol': symbol})
                 # Add to local database for future searches
@@ -61,6 +52,9 @@ def search_security():
                         print(f"Failed to add {name} ({symbol}) to the database. Error: {db_error}")
 
         return jsonify(suggestions)
+    except requests.exceptions.RequestException as req_err:
+        print(f"Request Error: {req_err}")
+        return jsonify({'error': str(req_err)}), 500
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({'error': str(e)}), 500
