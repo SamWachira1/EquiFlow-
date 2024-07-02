@@ -10,19 +10,14 @@
 
 .rightColumn {
   flex: 0 0 30%;
-  height: 100%;
-  /* position: sticky; */
-  /* top: 20px;
-  padding: 20px; */
-  /* border: 2px solid; */
-  /* border-radius: 8px;
+  position: sticky;
+  top: 20px;
+  padding: 20px;
+  border-radius: 8px;
   box-shadow: 0px 16px 10px rgba(0, 0, 0, 0.1);
   background-color: #fff;
-  z-index: 10;
-  max-height: 25em; */
-
+  max-height: 500px;
 }
-
 
 .header {
   text-align: center;
@@ -69,6 +64,16 @@
 
 .orderSection {
   margin-bottom: 20px;
+  position: sticky;
+  top: 20px;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #fff;
+  transition: box-shadow 0.3s ease;
+}
+
+.orderSection:hover {
+  box-shadow: 0px 16px 20px rgba(0, 0, 0, 0.2);
 }
 
 .orderSection h2 {
@@ -96,32 +101,41 @@
 .orderSection form button {
   padding: 10px;
   font-size: 1em;
-  background-color: green;
+  background-color: #00C807;
   color: white;
   border: none;
   cursor: pointer;
   margin-top: 10px;
+  border-radius: 13px;
 }
 
-.watchlist {
-  display: flex;
-  justify-content: center;
+.watchlistButtonContainer {
   margin-top: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* border: 2px solid #e0e0e0; */
+  border-radius: 8px;
+
 }
 
-.watchlist button {
+.addToWatchlistButton {
   padding: 10px 20px;
   font-size: 1em;
-  background-color: #007bff;
-  color: white;
+  /* background-color: #007bff; */
+  color: #00C806;
   border: none;
   cursor: pointer;
-  position: relative;
-  top: 6em;
+  border-radius: 19px;
+  margin-top: 10px;
+  width: 16em;
+  height: 3em;
+  border: 2px solid #00C806;
 }
 
-.watchlist button:hover {
-  background-color: #0056b3;
+.addToWatchlistButton:hover {
+  background-color: #EBF9EA;
 }
 
 .additionalInfo {
@@ -144,11 +158,4 @@
 
 .additionalInfo ul li {
   margin: 5px 0;
-}
-
-.watchlistButtonContainer {
-  margin-top: 20px; /* Adjust as needed */
-  text-align: center; /* Adjust as needed */
-  display: flex;
-  flex-direction: column;
 }
