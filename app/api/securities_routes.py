@@ -59,6 +59,7 @@ def fetch_real_time_data(symbol):
         return jsonify({'error': str(e)}), 500
 
 @securities_routes.route('/historical/1d/<symbol>', methods=['GET'])
+
 def get_1d_data(symbol):
     today = datetime.now()
     yesterday = today - timedelta(days=1)

@@ -17,7 +17,11 @@ import {
 } from '../../redux/securities';
 import RechartsAreaChart from '../Recharts';
 import LoadingSpinner from '../LoadingSpinner';
+// import OpenModalButton from '../OpenModalButton';
+import { useModal } from '../../context/Modal';
+import WatchlistModal from '../Watchlist/WatchlistModal';
 import styles from './SecuritiesPage.module.css';
+
 
 const SecuritiesPage = () => {
   const { symbol } = useParams();
@@ -27,6 +31,7 @@ const SecuritiesPage = () => {
 
   const { historicalData, fundamentalData, realTimeData } = useSelector((state) => state.securities);
   const { user } = useSelector((state) => state.session);
+  const { setModalContent, closeModal } = useModal();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -80,6 +85,11 @@ const SecuritiesPage = () => {
   const lowPrice = realTime.low || technicals.DayLow || 'N/A';
   const openPrice = realTime.open || technicals.DayOpen || 'N/A';
   const volume = realTime.volume || technicals.Volume || 'N/A';
+
+  const openWatchlistModal = () => {
+    setModalContent(<WatchlistModal stock={{ id: symbol, name: general.Name }} onClose={closeModal} />);
+  };
+
 
   return (
     user ? (
@@ -141,10 +151,15 @@ const SecuritiesPage = () => {
               <button type="submit">Review Order</button>
             </form>
           </div>
-          <div className={styles.watchlist}>
-            <button>Add to Watchlist</button>
+      
+          <div className={styles.watchlistButtonContainer}>
+            <button onClick={openWatchlistModal} className={styles.addToWatchlistButton}>Add to Lists</button>
           </div>
-        </div>
+      
+        </div >
+
+
+    
       </div>
     ) : null
   );

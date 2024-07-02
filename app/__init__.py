@@ -9,6 +9,7 @@ from .api.user_routes import user_routes
 from .api.auth_routes import auth_routes
 from .api.search_routes import search_routes
 from .api.securities_routes import securities_routes
+from .api.watchlist_routes import watchlist_routes
 from .seeds import seed_commands
 from .config import Config
 
@@ -32,12 +33,14 @@ app.register_blueprint(user_routes, url_prefix='/api/users')
 app.register_blueprint(auth_routes, url_prefix='/api/auth')
 app.register_blueprint(search_routes, url_prefix='/api/search')
 app.register_blueprint(securities_routes, url_prefix='/api/securities')
+app.register_blueprint(watchlist_routes, url_prefix='/api/watchlists')
 
 db.init_app(app)
 Migrate(app, db)
 
 # Application Security
 CORS(app)
+# CORS(app, supports_credentials=True, origins=["http://localhost:8000"])
 
 
 # Since we are deploying with Docker and Flask,

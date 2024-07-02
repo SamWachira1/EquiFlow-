@@ -1,25 +1,28 @@
 from flask import Blueprint, request, jsonify
 from app.models import Security, db
-from flask_login import login_required
+from flask_login import login_required, current_user
 
 import requests
 import os 
 
-search_routes = Blueprint('search', __name__)
+search_routes = Blueprint('search_routes', __name__)
 
 EODHD_API_KEY=os.getenv('EODHD_API_KEY')
 
-@search_routes.route('/', methods=['GET'])
-def search_security():
-    query = request.args.get('query')
-    if not query:
+@search_routes.route('/<symbol>', methods=['GET'])
+@login_required
+def search_security(symbol):
+    # Debug statement to confirm the user is authenticated
+    # print(f"User {current_user.id} is searching for securities with symbol {symbol}.")
+    
+    if not symbol:
         return jsonify({'error': 'No query provided'}), 400
 
     try:
         # Query local database first
         results = Security.query.filter(
-            (Security.name.ilike(f'{query}%')) | 
-            (Security.symbol.ilike(f'{query}%'))
+            (Security.name.ilike(f'{symbol}%')) | 
+            (Security.symbol.ilike(f'{symbol}%'))
         ).limit(5).all()
 
         suggestions = [{'name': s.name, 'symbol': s.symbol} for s in results]
@@ -29,10 +32,12 @@ def search_security():
             return jsonify(suggestions)
 
         # Fallback to EODHD search API if no results found locally
-        url = f'https://eodhd.com/api/search/{query}?api_token={EODHD_API_KEY}&fmt=json'
+        url = f'https://eodhd.com/api/search/{symbol}?api_token={EODHD_API_KEY}&fmt=json'
         response = requests.get(url)
         response.raise_for_status()
         api_response = response.json()
+
+        print(api_response)
         
         # Extract relevant data from the API response
         for result in api_response:
