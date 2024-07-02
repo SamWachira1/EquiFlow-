@@ -8,7 +8,9 @@ def create_seeder():
 
     ## SEED USERS
     user_list = [
-        {'username':'Demo', 'email':'demo@aa.io', 'buying_power': 10000, 'password':generate_password_hash("password")}
+        {'username':'Demo', 'email':'demo@aa.io', 'buying_power': 10000, 'password':generate_password_hash("password")},
+        {'username':'Sam', 'email':'187swachira@gmail.com', 'buying_power': 10000, 'password':generate_password_hash("password")}
+
     ]
 
     for user_data in user_list:
