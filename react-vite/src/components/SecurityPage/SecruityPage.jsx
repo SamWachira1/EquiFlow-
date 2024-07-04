@@ -17,21 +17,27 @@ import {
 } from '../../redux/securities';
 import RechartsAreaChart from '../Recharts';
 import LoadingSpinner from '../LoadingSpinner';
-// import OpenModalButton from '../OpenModalButton';
 import { useModal } from '../../context/Modal';
 import WatchlistModal from '../Watchlist/WatchlistModal';
 import styles from './SecuritiesPage.module.css';
-
 
 const SecuritiesPage = () => {
   const { symbol } = useParams();
   const dispatch = useDispatch();
   const [period, setPeriod] = useState('1d');
   const [loadingChart, setLoadingChart] = useState(true);
+  const [amount, setAmount] = useState(0);
+  const [estQuantity, setEstQuantity] = useState(0);
+  const [showBuyingPowerMessage, setShowBuyingPowerMessage] = useState(false);
+  const [orderType, setOrderType] = useState('buy');
+  const [buyIn, setBuyIn] = useState('usd');
+  const [buttonText, setButtonText] = useState('Add to Watch List');
+  const [isAdded, setIsAdded] = useState(false);
 
   const { historicalData, fundamentalData, realTimeData } = useSelector((state) => state.securities);
   const { user } = useSelector((state) => state.session);
   const { setModalContent, closeModal } = useModal();
+  const buyingPower = user?.buying_power || 0;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -79,17 +85,54 @@ const SecuritiesPage = () => {
   const technicals = fundamentalData.Technicals || {};
   const realTime = realTimeData || {};
 
-  const closePrice = realTime.close || technicals.Last || 'N/A';
-  const changePercentage = realTime.change_p || 'N/A';
-  const highPrice = realTime.high || technicals.DayHigh || 'N/A';
-  const lowPrice = realTime.low || technicals.DayLow || 'N/A';
-  const openPrice = realTime.open || technicals.DayOpen || 'N/A';
-  const volume = realTime.volume || technicals.Volume || 'N/A';
+  const closePrice = realTime.close || technicals.Last || '-';
+  const changePercentage = realTime.change_p || '-';
+  const highPrice = realTime.high || technicals.DayHigh || '-';
+  const lowPrice = realTime.low || technicals.DayLow || '-';
+  const openPrice = realTime.open || technicals.DayOpen || '-';
+  const volume = realTime.volume || technicals.Volume || '-';
 
   const openWatchlistModal = () => {
-    setModalContent(<WatchlistModal stock={{ id: symbol, name: general.Name }} onClose={closeModal} />);
+    setModalContent(
+      <WatchlistModal 
+        stock={{ id: symbol, name: general.Name }} 
+        onClose={(newMessage) => {
+          closeModal();
+          if (newMessage) {
+            setButtonText('✓ Added to Watchlist');
+            setIsAdded(true);
+            setTimeout(() => {
+              setButtonText('Add to Watch List');
+              setIsAdded(false);
+            }, 3000);
+          }
+        }} 
+      />
+    );
   };
 
+  useEffect(() => {
+    if (amount > 0 && closePrice !== '-') {
+      if (orderType === 'buy' && buyIn === 'usd') {
+        setEstQuantity((amount / closePrice).toFixed(6));
+      } else if (orderType === 'buy' && buyIn === 'shares') {
+        setEstQuantity(amount);
+      } else if (orderType === 'sell' && buyIn === 'usd') {
+        setEstQuantity(amount);
+      } else if (orderType === 'sell' && buyIn === 'shares') {
+        setEstQuantity((amount * closePrice).toFixed(2));
+      } else {
+        setEstQuantity(0);
+      }
+    } else {
+      setEstQuantity(0);
+    }
+  }, [amount, closePrice, orderType, buyIn]);
+
+  const handleReviewOrder = (e) => {
+    e.preventDefault();
+    setShowBuyingPowerMessage(true);
+  };
 
   return (
     user ? (
@@ -134,32 +177,43 @@ const SecuritiesPage = () => {
         </div>
         <div className={styles.rightColumn}>
           <div className={styles.orderSection}>
-            <h2>Buy {general.Name}</h2>
-            <form>
+            <h2>{orderType === 'buy' ? 'Buy' : 'Sell'} {general.Name}</h2>
+            <form onSubmit={handleReviewOrder}>
               <label>Order Type</label>
-              <select>
+              <select value={orderType} onChange={(e) => setOrderType(e.target.value)}>
                 <option value="buy">Buy Order</option>
                 <option value="sell">Sell Order</option>
               </select>
-              <label>Buy In</label>
-              <select>
-                <option value="usd">Dollars</option>
-                <option value="shares">Shares</option>
+              <label>{orderType === 'buy' ? 'Buy In' : 'Sell In'}</label>
+              <select value={buyIn} onChange={(e) => setBuyIn(e.target.value)}>
+                <option value="usd">{orderType === 'buy' ? 'Dollars' : 'Shares'}</option>
+                <option value="shares">{orderType === 'buy' ? 'Shares' : 'Dollars'}</option>
               </select>
               <label>Amount</label>
-              <input type="number" placeholder="0.00" />
+              <input 
+                type="number" 
+                placeholder="0.00" 
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+              />
+              <p>Est. {orderType === 'buy' ? 'Quantity' : 'Value'}: {estQuantity}</p>
               <button type="submit">Review Order</button>
             </form>
+            {showBuyingPowerMessage && (
+              <p className={styles.buyingPowerMessage}>${buyingPower.toFixed(2)} buying power available</p>
+            )}
           </div>
       
           <div className={styles.watchlistButtonContainer}>
-            <button onClick={openWatchlistModal} className={styles.addToWatchlistButton}>Add to Lists</button>
+            <button 
+              onClick={openWatchlistModal} 
+              className={styles.addToWatchlistButton} 
+              disabled={isAdded}
+            >
+              {buttonText}
+            </button>
           </div>
-      
-        </div >
-
-
-    
+        </div>
       </div>
     ) : null
   );

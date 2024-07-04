@@ -12,7 +12,7 @@
     height: 50px;
     margin: 0 5px;
     border-radius: 50%;
-    background-color: #34db66;
+    background-color: #00C807;
     animation: dotFlashing 1s infinite linear alternate;
   }
   

@@ -1,4 +1,4 @@
-import  { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   createWatchlistThunk,
@@ -6,18 +6,18 @@ import {
   updateWatchlistThunk,
   deleteWatchlistThunk,
   addStockToWatchlistThunk,
-  // getWatchlistsArray,
+  getMemoizedWatchlists
 } from '../../redux/watchlist';
-import styles from './Watchlist.module.css'
+import styles from './Watchlist.module.css';
 
 function WatchlistModal({ onClose, stock }) {
   const dispatch = useDispatch();
-  const watchlists = useSelector((state) => state.watchlist);
+  const watchlists = useSelector(getMemoizedWatchlists);
   const [selectedWatchlists, setSelectedWatchlists] = useState([]);
   const [newWatchlistName, setNewWatchlistName] = useState('');
   const [editMode, setEditMode] = useState(false);
   const [editWatchlistId, setEditWatchlistId] = useState(null);
-
+  const [isAdded, setIsAdded] = useState(false);
 
   useEffect(() => {
     dispatch(getWatchlistsThunk());
@@ -52,7 +52,8 @@ function WatchlistModal({ onClose, stock }) {
   const handleSubmit = () => {
     dispatch(addStockToWatchlistThunk(stock.id, selectedWatchlists))
       .then(() => {
-        onClose();
+        setIsAdded(true);
+        onClose('Stock added to watchlists successfully'); // Pass message to onClose callback
       });
   };
 
@@ -74,7 +75,7 @@ function WatchlistModal({ onClose, stock }) {
           )}
         </div>
         <div className={styles.watchlistItems}>
-          {watchlists?.map(watchlist => (
+          {watchlists.map(watchlist => (
             <div key={watchlist.id} className={styles.watchlistItem}>
               <input
                 type="checkbox"
@@ -94,8 +95,10 @@ function WatchlistModal({ onClose, stock }) {
           ))}
         </div>
         <div className={styles.modalActions}>
-          <button onClick={handleSubmit}>Save Changes</button>
-          <button onClick={onClose}>Close</button>
+          <button onClick={handleSubmit} disabled={isAdded}>
+            {isAdded ? '✓ Added to Watchlist' : 'Save Changes'}
+          </button>
+          <button onClick={() => onClose(null)}>Close</button>
         </div>
       </div>
     </div>

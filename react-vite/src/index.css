@@ -12,10 +12,8 @@
   }
   
   body {
-    font-family: "Montserrat", Inter, Arial, Helvetica, sans-serif;
-    background-color: white;
+    font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
-  
   
   a {
     text-decoration: none;

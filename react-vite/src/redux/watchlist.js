@@ -1,4 +1,4 @@
-// import { createSelector } from "reselect";
+import { createSelector } from "reselect";
 
 // Action Types
 const CREATE_WATCHLIST = "watchlist/create_watchlist";
@@ -87,33 +87,34 @@ export const deleteWatchlistThunk = (id) => async (dispatch) => {
         console.log(error);
     }
 };
-
 export const addStockToWatchlistThunk = (stockId, watchlistIds) => async (dispatch) => {
     try {
-        const response = await fetch('/api/watchlists/addStock', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ stockId, watchlistIds }),
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            dispatch(action(ADD_STOCK_TO_WATCHLIST, data));
-            return data;
-        }
+      const response = await fetch('/api/watchlists/addStock', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ stockId, watchlistIds }),
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        dispatch(action(ADD_STOCK_TO_WATCHLIST, { message: data.message }));
+        return data;
+      }
     } catch (error) {
-        console.log(error);
+      console.log(error);
     }
-};
+  };
 
-// Selectors
-// export const getWatchlistsArray = createSelector(
-//     (state) => state.watchlists || {},  // Default to an empty object if undefined or null
-//     (watchlists) => Object.values(watchlists)
-// );
 
+
+const getWatchlists = (state) => state.watchlist;
+
+export const getMemoizedWatchlists = createSelector(
+    [getWatchlists],
+    (watchlists) => Object.values(watchlists)
+  );
 
 
 const initialState = [];
@@ -130,11 +131,12 @@ const watchlistReducer = (state = initialState, action) => {
             );
         case DELETE_WATCHLIST:
             return state.filter(watchlist => watchlist.id !== action.payload);
+
         case ADD_STOCK_TO_WATCHLIST:
-            return state.map(watchlist => {
-                const updatedWatchlist = action.payload.find(w => w.id === watchlist.id);
-                return updatedWatchlist ? updatedWatchlist : watchlist;
-            });
+                return {
+                  ...state,
+                  message: action.payload.message // Store the message in the state
+                };
         default:
             return state;
     }
