@@ -10,6 +10,9 @@ from .api.auth_routes import auth_routes
 from .api.search_routes import search_routes
 from .api.securities_routes import securities_routes
 from .api.watchlist_routes import watchlist_routes
+from .api.holdings_routes import holding_routes
+from .api.transactions_routes import transaction_routes
+
 from .seeds import seed_commands
 from .config import Config
 
@@ -34,6 +37,8 @@ app.register_blueprint(auth_routes, url_prefix='/api/auth')
 app.register_blueprint(search_routes, url_prefix='/api/search')
 app.register_blueprint(securities_routes, url_prefix='/api/securities')
 app.register_blueprint(watchlist_routes, url_prefix='/api/watchlists')
+app.register_blueprint(holding_routes, url_prefix='/api/holdings')
+app.register_blueprint(transaction_routes, url_prefix='/api/transactions')
 
 db.init_app(app)
 Migrate(app, db)

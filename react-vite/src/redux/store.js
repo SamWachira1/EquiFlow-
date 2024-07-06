@@ -9,12 +9,14 @@ import sessionReducer from "./session";
 import searchReducer from "./search";
 import securitiesReducer from "./securities";
 import watchlistReducer from "./watchlist";
+import holdingsReducer from "./holdings";
 
 const rootReducer = combineReducers({
   session: sessionReducer,
   search: searchReducer,
   securities: securitiesReducer,
   watchlist: watchlistReducer,
+  holdings: holdingsReducer
 
 });
 

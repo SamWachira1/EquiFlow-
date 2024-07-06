@@ -1,5 +1,6 @@
 const SET_USER = 'session/setUser';
 const REMOVE_USER = 'session/removeUser';
+const UPDATE_BUYING_POWER = 'session/updateBuyingPower';
 
 const setUser = (user) => ({
   type: SET_USER,
@@ -8,6 +9,11 @@ const setUser = (user) => ({
 
 const removeUser = () => ({
   type: REMOVE_USER
+});
+
+export const updateBuyingPower = (newBuyingPower) => ({
+  type: UPDATE_BUYING_POWER,
+  payload: newBuyingPower,
 });
 
 export const thunkAuthenticate = () => async (dispatch) => {
@@ -71,6 +77,15 @@ function sessionReducer(state = initialState, action) {
       return { ...state, user: action.payload };
     case REMOVE_USER:
       return { ...state, user: null };
+
+    case UPDATE_BUYING_POWER:
+        return {
+          ...state,
+          user: {
+            ...state.user,
+            buying_power: action.payload,
+          },
+        };
     default:
       return state;
   }

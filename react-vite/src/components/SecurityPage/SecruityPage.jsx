@@ -15,6 +15,9 @@ import {
   clearFundamentalData,
   clearRealTimeData,
 } from '../../redux/securities';
+
+import { buyHoldingThunk, sellHoldingThunk, getHoldingsThunk } from '../../redux/holdings';
+import { thunkAuthenticate } from '../../redux/session'; // Import the authentication thunk
 import RechartsAreaChart from '../Recharts';
 import LoadingSpinner from '../LoadingSpinner';
 import { useModal } from '../../context/Modal';
@@ -33,11 +36,13 @@ const SecuritiesPage = () => {
   const [buyIn, setBuyIn] = useState('usd');
   const [buttonText, setButtonText] = useState('Add to Watch List');
   const [isAdded, setIsAdded] = useState(false);
+  const [availableShares, setAvailableShares] = useState(0); // Add state for available shares
 
   const { historicalData, fundamentalData, realTimeData } = useSelector((state) => state.securities);
   const { user } = useSelector((state) => state.session);
+  const holdings = useSelector((state) => state.holdings); // Add holdings from state
   const { setModalContent, closeModal } = useModal();
-  const buyingPower = user?.buying_power || 0;
+  const buyingPower = user?.buying_power ? user.buying_power.toFixed(2) : '0.00'; // Round buying power
 
   useEffect(() => {
     const fetchData = async () => {
@@ -80,6 +85,15 @@ const SecuritiesPage = () => {
 
     fetchData();
   }, [period, dispatch, symbol]);
+
+  useEffect(() => {
+    dispatch(getHoldingsThunk());
+  }, [dispatch]);
+
+  useEffect(() => {
+    const holding = holdings.find(h => h.security_id === symbol);
+    setAvailableShares(holding ? holding.shares.toFixed(2) : 0);
+  }, [holdings, symbol]);
 
   const general = fundamentalData.General || {};
   const technicals = fundamentalData.Technicals || {};
@@ -134,6 +148,41 @@ const SecuritiesPage = () => {
     setShowBuyingPowerMessage(true);
   };
 
+  const handleSubmitOrder = async (e) => {
+    e.preventDefault();
+    
+    const parsedAmount = parseFloat(amount);
+    const parsedEstQuantity = parseFloat(estQuantity);
+    const parsedClosePrice = parseFloat(closePrice);
+  
+    if (orderType === 'buy') {
+      if (buyIn === 'usd') {
+        await dispatch(buyHoldingThunk(symbol, parsedEstQuantity, parsedClosePrice));
+
+      } else if (buyIn === 'shares') {
+        await dispatch(buyHoldingThunk(symbol, parsedAmount, parsedClosePrice));
+      }
+    } else if (orderType === 'sell') {
+      if (buyIn === 'usd') {
+        await dispatch(sellHoldingThunk(symbol, parsedEstQuantity, parsedClosePrice));
+      } else if (buyIn === 'shares') {
+        await dispatch(sellHoldingThunk(symbol, parsedAmount, parsedClosePrice));
+
+      }
+    }
+
+    await dispatch(thunkAuthenticate()); // Refresh user data
+    dispatch(getHoldingsThunk()); // Refresh holdings data
+
+  };
+  
+  useEffect(() => {
+    if (orderType === 'sell') {
+      const holding = holdings.find(h => h.security_id === symbol);
+      setAvailableShares(holding ? holding.shares.toFixed(2) : 0);
+    }
+  }, [orderType, holdings, symbol]);
+
   return (
     user ? (
       <div className={styles.securitiesPage}>
@@ -178,7 +227,7 @@ const SecuritiesPage = () => {
         <div className={styles.rightColumn}>
           <div className={styles.orderSection}>
             <h2>{orderType === 'buy' ? 'Buy' : 'Sell'} {general.Name}</h2>
-            <form onSubmit={handleReviewOrder}>
+            <form onSubmit={showBuyingPowerMessage ? handleSubmitOrder : handleReviewOrder}>
               <label>Order Type</label>
               <select value={orderType} onChange={(e) => setOrderType(e.target.value)}>
                 <option value="buy">Buy Order</option>
@@ -196,11 +245,11 @@ const SecuritiesPage = () => {
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
               />
-              <p>Est. {orderType === 'buy' ? 'Quantity' : 'Value'}: {estQuantity}</p>
-              <button type="submit">Review Order</button>
+              <p>{orderType === 'buy' ? `Est. Quantity: ${estQuantity}` : `Available Shares: ${availableShares}`}</p>
+              <button type="submit">{showBuyingPowerMessage ? 'Submit Order' : 'Review Order'}</button>
             </form>
             {showBuyingPowerMessage && (
-              <p className={styles.buyingPowerMessage}>${buyingPower.toFixed(2)} buying power available</p>
+              <p className={styles.buyingPowerMessage}>${buyingPower} buying power available</p>
             )}
           </div>
       
@@ -218,5 +267,6 @@ const SecuritiesPage = () => {
     ) : null
   );
 };
+
 
 export default SecuritiesPage;
