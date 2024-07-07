@@ -1,4 +1,4 @@
-"""empty message
+"""Change security_id to String in holdings and transactions
 
 Revision ID: 5370c48333b2
 Revises: 9a71111ebd8c
@@ -29,23 +29,23 @@ def upgrade():
     op.create_table('holdings',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('security_id', sa.Integer(), nullable=False),
+    sa.Column('security_id', sa.String(length=10), nullable=False),
     sa.Column('shares', sa.Float(), nullable=False),
     sa.Column('purchase_price', sa.Float(), nullable=True),
     sa.Column('purchase_date', sa.DateTime(timezone=True), nullable=True),
-    sa.ForeignKeyConstraint(['security_id'], ['securities.id'], ),
+    sa.ForeignKeyConstraint(['security_id'], ['securities.symbol'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('transactions',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('security_id', sa.Integer(), nullable=False),
+    sa.Column('security_id', sa.String(length=10), nullable=False),
     sa.Column('shares', sa.Float(), nullable=False),
     sa.Column('transaction_type', sa.String(length=10), nullable=False),
     sa.Column('transaction_price', sa.Float(), nullable=False),
     sa.Column('transaction_date', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
-    sa.ForeignKeyConstraint(['security_id'], ['securities.id'], ),
+    sa.ForeignKeyConstraint(['security_id'], ['securities.symbol'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -58,9 +58,9 @@ def upgrade():
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('watchlist_securities',
-    sa.Column('security_id', sa.Integer(), nullable=False),
+    sa.Column('security_id', sa.String(length=10), nullable=False),
     sa.Column('watchlist_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['security_id'], ['securities.id'], ),
+    sa.ForeignKeyConstraint(['security_id'], ['securities.symbol'], ),
     sa.ForeignKeyConstraint(['watchlist_id'], ['watchlists.id'], ),
     sa.PrimaryKeyConstraint('security_id', 'watchlist_id')
     )
