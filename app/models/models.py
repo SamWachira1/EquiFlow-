@@ -4,7 +4,6 @@ from flask_login import UserMixin
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship, backref
 
-
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
 
@@ -20,8 +19,6 @@ class User(db.Model, UserMixin):
     holdings = relationship('Holding', backref='user', cascade='all, delete-orphan')
     transactions = relationship('Transaction', backref='user', cascade='all, delete-orphan')
     watchlists = relationship('Watchlist', backref='user', cascade='all, delete-orphan')
-
-
 
     @property
     def password(self):
@@ -71,7 +68,7 @@ class Holding(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('users.id')), nullable=False)
-    security_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('securities.id')), nullable=False)
+    security_id = db.Column(db.String(10), db.ForeignKey(add_prefix_for_prod('securities.symbol')), nullable=False)
     shares = db.Column(db.Float, nullable=False)
     purchase_price = db.Column(db.Float)
     purchase_date = db.Column(db.DateTime(timezone=True))
@@ -94,7 +91,7 @@ class Transaction(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('users.id')), nullable=False)
-    security_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('securities.id')), nullable=False)
+    security_id = db.Column(db.String(10), db.ForeignKey(add_prefix_for_prod('securities.symbol')), nullable=False)
     shares = db.Column(db.Float, nullable=False)
     transaction_type = db.Column(db.String(10), nullable=False)
     transaction_price = db.Column(db.Float, nullable=False)
@@ -138,7 +135,7 @@ class WatchlistSecurity(db.Model):
     if environment == "production":
         __table_args__ = {'schema': SCHEMA}
 
-    security_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('securities.id')), primary_key=True)
+    security_id = db.Column(db.String(10), db.ForeignKey(add_prefix_for_prod('securities.symbol')), primary_key=True)
     watchlist_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('watchlists.id')), primary_key=True)
 
     def to_dict(self):
