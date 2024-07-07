@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_login import login_required, current_user
-from app.models import db, Holding, Transaction
+from app.models import db, Holding, Transaction, Security
 from datetime import datetime
 import pytz
 
@@ -16,72 +16,101 @@ def get_holdings():
 @login_required
 def create_holding():
     data = request.get_json()
-    security_id = data.get('security_id')
+    stock_symbol = data.get('stock_symbol')
+    stock_name = data.get('stock_name')
     shares = data.get('shares')
     purchase_price = data.get('purchase_price')
 
     est = pytz.timezone('US/Eastern')
     purchase_date = datetime.now(est)
 
-    holding = Holding.query.filter_by(user_id=current_user.id, security_id=security_id).first()
-    if holding:
-        holding.shares += shares
-        holding.purchase_price = purchase_price  # Update purchase price to the latest buy price
-    else:
-        holding = Holding(
+    try:
+        # Check if the stock already exists in the securities table
+        stock = Security.query.filter_by(symbol=stock_symbol).first()
+        if not stock:
+            # Add the stock to the securities table
+            stock = Security(symbol=stock_symbol, name=stock_name)
+            db.session.add(stock)
+            db.session.commit()
+        
+        # Get the stock ID after committing the new stock
+        stock_id = stock.id
+
+        holding = Holding.query.filter_by(user_id=current_user.id, security_id=stock_id).first()
+        if holding:
+            holding.shares += shares
+            holding.purchase_price = purchase_price  # Update purchase price to the latest buy price
+        else:
+            holding = Holding(
+                user_id=current_user.id,
+                security_id=stock_id,
+                shares=shares,
+                purchase_price=purchase_price,
+                purchase_date=purchase_date
+            )
+            db.session.add(holding)
+
+        transaction = Transaction(
             user_id=current_user.id,
-            security_id=security_id,
+            security_id=stock_id,
             shares=shares,
-            purchase_price=purchase_price,
-            purchase_date=purchase_date
+            transaction_type='buy',
+            transaction_price=purchase_price,
+            transaction_date=purchase_date
         )
-        db.session.add(holding)
+        db.session.add(transaction)
 
-    transaction = Transaction(
-        user_id=current_user.id,
-        security_id=security_id,
-        shares=shares,
-        transaction_type='buy',
-        transaction_price=purchase_price,
-        transaction_date=purchase_date
-    )
-    db.session.add(transaction)
+        current_user.buying_power -= shares * purchase_price
+        db.session.commit()
+        return jsonify({'holding': holding.to_dict(), 'buying_power': current_user.buying_power}), 201
 
-    current_user.buying_power -= shares * purchase_price
-    db.session.commit()
-    return jsonify({'holding': holding.to_dict(), 'buying_power': current_user.buying_power}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
 
 @holding_routes.route('/sell', methods=['POST'])
 @login_required
 def sell_holding():
     data = request.get_json()
-    security_id = data.get('security_id')
+    stock_symbol = data.get('stock_symbol')
     shares_to_sell = data.get('shares')
     sell_price = data.get('sell_price')
 
-    holding = Holding.query.filter_by(user_id=current_user.id, security_id=security_id).first()
-    if not holding or holding.shares < shares_to_sell:
-        return jsonify({'error': 'Not enough shares to sell'}), 400
+    try:
+        # Check if the stock already exists in the securities table
+        stock = Security.query.filter_by(symbol=stock_symbol).first()
+        if not stock:
+            return jsonify({'error': 'Stock does not exist'}), 400
+        
+        stock_id = stock.id
 
-    est = pytz.timezone('US/Eastern')
-    transaction_date = datetime.now(est)
+        holding = Holding.query.filter_by(user_id=current_user.id, security_id=stock_id).first()
+        if not holding or holding.shares < shares_to_sell:
+            return jsonify({'error': 'Not enough shares to sell'}), 400
 
-    # Create a sell transaction
-    transaction = Transaction(
-        user_id=current_user.id,
-        security_id=security_id,
-        shares=shares_to_sell,
-        transaction_type='sell',
-        transaction_price=sell_price,
-        transaction_date=transaction_date
-    )
-    db.session.add(transaction)
+        est = pytz.timezone('US/Eastern')
+        transaction_date = datetime.now(est)
 
-    # Update the holding
-    holding.shares -= shares_to_sell
-    if holding.shares == 0:
-        db.session.delete(holding)
-    current_user.buying_power += shares_to_sell * sell_price
-    db.session.commit()
+        # Create a sell transaction
+        transaction = Transaction(
+            user_id=current_user.id,
+            security_id=stock_id,
+            shares=shares_to_sell,
+            transaction_type='sell',
+            transaction_price=sell_price,
+            transaction_date=transaction_date
+        )
+        db.session.add(transaction)
 
-    return jsonify({'holding': holding.to_dict(), 'buying_power': current_user.buying_power}), 200
+        # Update the holding
+        holding.shares -= shares_to_sell
+        if holding.shares == 0:
+            db.session.delete(holding)
+        current_user.buying_power += shares_to_sell * sell_price
+        db.session.commit()
+
+        return jsonify({'holding': holding.to_dict(), 'buying_power': current_user.buying_power}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500

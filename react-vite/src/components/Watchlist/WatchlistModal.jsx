@@ -50,7 +50,7 @@ function WatchlistModal({ onClose, stock }) {
   };
 
   const handleSubmit = () => {
-    dispatch(addStockToWatchlistThunk(stock.id, selectedWatchlists))
+    dispatch(addStockToWatchlistThunk(stock.symbol, stock.name, selectedWatchlists))
       .then(() => {
         setIsAdded(true);
         onClose('Stock added to watchlists successfully'); // Pass message to onClose callback

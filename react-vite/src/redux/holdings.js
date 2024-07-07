@@ -36,14 +36,15 @@ export const getHoldingsThunk = () => async (dispatch) => {
     }
 };
 
-export const buyHoldingThunk = (security_id, shares, purchase_price) => async (dispatch) => {
+export const buyHoldingThunk = (stockSymbol, stockName, shares, purchasePrice) => async (dispatch) => {
+    console.log(stockSymbol, stockName, shares, purchasePrice)
     try {
         const response = await fetch('/api/holdings/buy', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ security_id, shares, purchase_price }),
+            body: JSON.stringify({ stock_symbol: stockSymbol, stock_name: stockName, shares, purchase_price: purchasePrice }),
         });
 
         if (response.ok) {
@@ -57,14 +58,14 @@ export const buyHoldingThunk = (security_id, shares, purchase_price) => async (d
     }
 };
 
-export const sellHoldingThunk = (security_id, shares, sell_price) => async (dispatch) => {
+export const sellHoldingThunk = (stockSymbol, shares, sellPrice) => async (dispatch) => {
     try {
         const response = await fetch('/api/holdings/sell', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ security_id, shares, sell_price }),
+            body: JSON.stringify({ stock_symbol: stockSymbol, shares, sell_price: sellPrice }),
         });
 
         if (response.ok) {

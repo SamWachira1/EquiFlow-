@@ -109,7 +109,7 @@ const SecuritiesPage = () => {
   const openWatchlistModal = () => {
     setModalContent(
       <WatchlistModal 
-        stock={{ id: symbol, name: general.Name }} 
+        stock={{ symbol: symbol, name: general.Name }} 
         onClose={(newMessage) => {
           closeModal();
           if (newMessage) {
@@ -157,17 +157,15 @@ const SecuritiesPage = () => {
   
     if (orderType === 'buy') {
       if (buyIn === 'usd') {
-        await dispatch(buyHoldingThunk(symbol, parsedEstQuantity, parsedClosePrice));
-
+        await dispatch(buyHoldingThunk(symbol, general.Name, parsedEstQuantity, parsedClosePrice));
       } else if (buyIn === 'shares') {
-        await dispatch(buyHoldingThunk(symbol, parsedAmount, parsedClosePrice));
+        await dispatch(buyHoldingThunk(symbol, general.Name, parsedAmount, parsedClosePrice));
       }
     } else if (orderType === 'sell') {
       if (buyIn === 'usd') {
         await dispatch(sellHoldingThunk(symbol, parsedEstQuantity, parsedClosePrice));
       } else if (buyIn === 'shares') {
         await dispatch(sellHoldingThunk(symbol, parsedAmount, parsedClosePrice));
-
       }
     }
 

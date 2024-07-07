@@ -87,20 +87,27 @@ export const deleteWatchlistThunk = (id) => async (dispatch) => {
         console.log(error);
     }
 };
-export const addStockToWatchlistThunk = (stockId, watchlistIds) => async (dispatch) => {
+
+export const addStockToWatchlistThunk = (stockSymbol, stockName, watchlistIds) => async (dispatch) => {
+    
     try {
       const response = await fetch('/api/watchlists/addStock', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ stockId, watchlistIds }),
+        body: JSON.stringify({ stockSymbol, stockName, watchlistIds }),
+        
       });
   
       if (response.ok) {
         const data = await response.json();
         dispatch(action(ADD_STOCK_TO_WATCHLIST, { message: data.message }));
         return data;
+      } else {
+        // Handle non-OK responses
+        const errorData = await response.json();
+        console.log(errorData);
       }
     } catch (error) {
       console.log(error);

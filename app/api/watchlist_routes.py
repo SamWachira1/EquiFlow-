@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_login import login_required, current_user
-from app.models import db, Watchlist, WatchlistSecurity
+from app.models import db, Watchlist, WatchlistSecurity, Security
 from app.forms import WatchlistForm
 
 
@@ -78,14 +78,23 @@ def delete_watchlist(id):
 @watchlist_routes.route('/addStock', methods=['POST'])
 @login_required
 def add_stock_to_watchlists():
-    print("Add stock to watchlists endpoint hit!")  # Debug statement to check if the route is hit
     data = request.get_json()
-    print(f"Received data: {data}")  # Log the received data
-
-    stock_id = data.get('stockId')
+    stock_symbol = data.get('stockSymbol')
+    stock_name = data.get('stockName')
     watchlist_ids = data.get('watchlistIds')
 
     try:
+        # Check if the stock already exists in the securities table
+        stock = Security.query.filter_by(symbol=stock_symbol).first()
+        if not stock:
+            # Add the stock to the securities table
+            stock = Security(symbol=stock_symbol, name=stock_name)
+            db.session.add(stock)
+            db.session.commit()
+        
+        # Get the stock ID after committing the new stock
+        stock_id = stock.id
+
         for watchlist_id in watchlist_ids:
             watchlist = Watchlist.query.get(watchlist_id)
             if watchlist and watchlist.user_id == current_user.id:
@@ -98,5 +107,4 @@ def add_stock_to_watchlists():
         return jsonify({'message': 'Stock added to watchlists successfully'}), 200
     except Exception as e:
         db.session.rollback()
-        print(f"Error: {e}")  # Log the error
         return jsonify({'error': str(e)}), 500
