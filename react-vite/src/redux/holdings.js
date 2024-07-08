@@ -37,7 +37,6 @@ export const getHoldingsThunk = () => async (dispatch) => {
 };
 
 export const buyHoldingThunk = (stockSymbol, stockName, shares, purchasePrice) => async (dispatch) => {
-    console.log(stockSymbol, stockName, shares, purchasePrice)
     try {
         const response = await fetch('/api/holdings/buy', {
             method: 'POST',
@@ -73,12 +72,16 @@ export const sellHoldingThunk = (stockSymbol, shares, sellPrice) => async (dispa
             dispatch(action(SELL_HOLDING, data.holding)); // Dispatch holding data
             dispatch(updateBuyingPower(data.buying_power)); // Dispatch updated buying power
             return data;
+        } else {
+            const errorData = await response.json();
+            console.error('Error selling holding:', errorData.error);
+            // Handle error accordingly, maybe dispatch an error action
         }
     } catch (error) {
-        console.log(error);
+        console.error('Error selling holding:', error);
+        // Handle error accordingly, maybe dispatch an error action
     }
 };
-
 // Selectors
 const getHoldings = (state) => state.holdings;
 

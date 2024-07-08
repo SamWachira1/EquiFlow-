@@ -134,6 +134,7 @@ export const fetchRealTimeData = (symbol) => async (dispatch) => {
   }
 };
 
+
 export const clearHistoricalData = () => async (dispatch) => {
   dispatch(action(CLEAR_HISTORICAL_DATA));
 };

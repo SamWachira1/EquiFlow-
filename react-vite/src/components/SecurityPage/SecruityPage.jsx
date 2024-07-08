@@ -16,6 +16,8 @@ import {
   clearRealTimeData,
 } from '../../redux/securities';
 
+import { fetchSearchResults } from '../../redux/search';
+
 import { buyHoldingThunk, sellHoldingThunk, getHoldingsThunk } from '../../redux/holdings';
 import { thunkAuthenticate } from '../../redux/session'; // Import the authentication thunk
 import RechartsAreaChart from '../Recharts';
@@ -43,6 +45,10 @@ const SecuritiesPage = () => {
   const holdings = useSelector((state) => state.holdings); // Add holdings from state
   const { setModalContent, closeModal } = useModal();
   const buyingPower = user?.buying_power ? user.buying_power.toFixed(2) : '0.00'; // Round buying power
+  const securityId = useSelector((state) => state.search.
+  selectedSecurity.id);
+
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -50,6 +56,8 @@ const SecuritiesPage = () => {
       await dispatch(fetchHistoricalData1D(symbol)); // Fetch 1D data by default
       await dispatch(fetchFundamentalData(symbol));
       await dispatch(fetchRealTimeData(symbol));
+      await dispatch(fetchSearchResults(symbol))
+
       setLoadingChart(false);
     };
 
@@ -91,9 +99,15 @@ const SecuritiesPage = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    const holding = holdings.find(h => h.security_id === symbol);
-    setAvailableShares(holding ? holding.shares.toFixed(2) : 0);
-  }, [holdings, symbol]);
+    const updateAvailableShares = async () => {
+  
+      if (orderType === 'sell' && securityId !== null) {
+        const holding = holdings.find(h => h.security_id === securityId);
+        setAvailableShares(holding ? holding.shares.toFixed(2) : 0);
+      }
+    };
+    updateAvailableShares();
+  }, [orderType, holdings, symbol, securityId, dispatch]);
 
   const general = fundamentalData.General || {};
   const technicals = fundamentalData.Technicals || {};
@@ -174,13 +188,6 @@ const SecuritiesPage = () => {
 
   };
   
-  useEffect(() => {
-    if (orderType === 'sell') {
-      const holding = holdings.find(h => h.security_id === symbol);
-      setAvailableShares(holding ? holding.shares.toFixed(2) : 0);
-    }
-  }, [orderType, holdings, symbol]);
-
   return (
     user ? (
       <div className={styles.securitiesPage}>
@@ -265,6 +272,5 @@ const SecuritiesPage = () => {
     ) : null
   );
 };
-
 
 export default SecuritiesPage;

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import styles from './SearchBar.module.css'
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
-import { fetchSearchResults } from '../../redux/search';
+import { fetchSearchResults, fetchSelectedSecurityDetails} from '../../redux/search';
 import { useNavigate } from 'react-router-dom';
 
 function SearchBar() {
@@ -26,8 +26,9 @@ function SearchBar() {
         setQuery(e.target.value);
     };
   
-    const handleResultClick = (symbol) => {
+    const handleResultClick = async (symbol) => {
         setQuery(''); // Clear the search input
+        await dispatch(fetchSelectedSecurityDetails(symbol)); // Fetch and add the security to the database if it doesn't exist
         navigate(`/securities/${symbol}`); // Navigate to the securities page
     };
   
