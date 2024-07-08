@@ -23,7 +23,7 @@ import { thunkAuthenticate } from '../../redux/session'; // Import the authentic
 import RechartsAreaChart from '../Recharts';
 import LoadingSpinner from '../LoadingSpinner';
 import { useModal } from '../../context/Modal';
-import WatchlistModal from '../Watchlist/WatchlistModal';
+import WatchlistModal from '../WatchlistModal/WatchlistModal';
 import styles from './SecuritiesPage.module.css';
 
 const SecuritiesPage = () => {
@@ -45,8 +45,7 @@ const SecuritiesPage = () => {
   const holdings = useSelector((state) => state.holdings); // Add holdings from state
   const { setModalContent, closeModal } = useModal();
   const buyingPower = user?.buying_power ? user.buying_power.toFixed(2) : '0.00'; // Round buying power
-  const securityId = useSelector((state) => state.search.
-  selectedSecurity.id);
+  const securityId = useSelector((state) => state.search?.selectedSecurity.id);
 
 
 

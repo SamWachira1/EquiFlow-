@@ -2,7 +2,10 @@ from flask import Blueprint, jsonify, request
 from flask_login import login_required, current_user
 from app.models import db, Watchlist, WatchlistSecurity, Security
 from app.forms import WatchlistForm
+import requests
+import os
 
+EODHD_API_KEY = os.getenv('EODHD_API_KEY')
 
 watchlist_routes = Blueprint('watchlists', __name__)
 
@@ -108,3 +111,44 @@ def add_stock_to_watchlists():
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
+
+@watchlist_routes.route('/details', methods=['GET'])
+@login_required
+def get_watchlist_details():
+    try:
+        watchlists = Watchlist.query.filter_by(user_id=current_user.id).all()
+        watchlist_data = []
+
+        for watchlist in watchlists:
+            securities_data = []
+            for ws in watchlist.watchlist_securities:
+                security = Security.query.get(ws.security_id)
+                current_price, price_change = get_current_price_and_change(security.symbol)
+                securities_data.append({
+                    'symbol': security.symbol,
+                    'price': current_price,
+                    'changePercent': price_change,
+                })
+
+            watchlist_data.append({
+                'id': watchlist.id,
+                'name': watchlist.name,
+                'securities': securities_data,
+            })
+
+        return jsonify(watchlist_data), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+def get_current_price_and_change(symbol):
+    try:
+        url = f'https://eodhd.com/api/real-time/{symbol}?api_token={EODHD_API_KEY}&fmt=json'
+        response = requests.get(url)
+        response.raise_for_status()
+        data = response.json()
+        current_price = data.get('close', 0)
+        price_change = data.get('change_p', 0)
+        return current_price, price_change
+    except requests.exceptions.RequestException as e:
+        return 0, 0

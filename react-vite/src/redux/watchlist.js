@@ -6,6 +6,7 @@ const GET_WATCHLISTS = "watchlist/get_watchlists";
 const UPDATE_WATCHLIST = "watchlist/update_watchlist";
 const DELETE_WATCHLIST = "watchlist/delete_watchlist";
 const ADD_STOCK_TO_WATCHLIST = "watchlist/add_stock_to_watchlist";
+const GET_WATCHLIST_DETAILS = 'watchlist/get_watchlist_details';
 
 
 // Action Creators
@@ -50,6 +51,24 @@ export const getWatchlistsThunk = () => async (dispatch) => {
         }
     } catch (error) {
         console.log('Error fetching watchlists:', error);
+    }
+};
+
+export const getWatchlistDetailsThunk = () => async (dispatch) => {
+    try {
+        const response = await fetch('/api/watchlists/details', {
+            method: 'GET',
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            dispatch(action(GET_WATCHLIST_DETAILS, data));
+            return data;
+        } else {
+            console.error('Failed to fetch watchlist details:', response.statusText);
+        }
+    } catch (error) {
+        console.log('Error fetching watchlist details:', error);
     }
 };
 
@@ -130,6 +149,8 @@ const watchlistReducer = (state = initialState, action) => {
     switch (action.type) {
         case GET_WATCHLISTS:
             return action.payload;
+        case GET_WATCHLIST_DETAILS:
+            return action.payload
         case CREATE_WATCHLIST:
             return [...state, action.payload];
         case UPDATE_WATCHLIST:
@@ -140,10 +161,8 @@ const watchlistReducer = (state = initialState, action) => {
             return state.filter(watchlist => watchlist.id !== action.payload);
 
         case ADD_STOCK_TO_WATCHLIST:
-                return {
-                  ...state,
-                  message: action.payload.message // Store the message in the state
-                };
+                return [...state, action.payload]
+                 
         default:
             return state;
     }
