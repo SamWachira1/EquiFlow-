@@ -6,6 +6,12 @@
     background-color: #f5f5f5;
   }
   
+  .watchlistItems {
+    list-style-type: none; /* Remove bullets */
+    padding: 0; /* Remove default padding */
+    margin: 0; /* Remove default margin */
+  }
+  
   .watchlist {
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -28,19 +34,19 @@
     font-size: 1.2rem;
   }
   
-  .securitiesList {
-    list-style: none;
-    padding: 0;
-    margin: 1rem 0 0 0;
-  }
-  
   .securityItem {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0.5rem 0;
-    border-top: 1px solid #eee;
+    border-bottom: 2px solid #ddd;
     font-size: 1rem;
+  }
+  
+  .securityDetails {
+    display: flex;
+    align-items: center;
+    width: 100%;
   }
   
   .securitySymbol {
@@ -49,6 +55,7 @@
   
   .securityPrice {
     margin-left: auto;
+    padding-left: 1rem;
   }
   
   .securityChange {
