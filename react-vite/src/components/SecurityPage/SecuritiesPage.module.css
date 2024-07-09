@@ -1,4 +1,3 @@
-
 .securitiesPage {
   display: flex;
   padding: 20px;
@@ -15,11 +14,9 @@
   top: 20px;
   padding: 20px;
   border-radius: 8px;
-  /* box-shadow: 0px 16px 10px rgba(0, 0, 0, 0.1); */
   background-color: #fff;
   max-height: 36em;
 }
-
 
 .header {
   text-align: center;
@@ -47,21 +44,50 @@
 
 .periodButtons {
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   margin-bottom: 20px;
+  padding: 10px 0; /* Adjust the padding as needed */
+  border-bottom: 1px solid #d3d3d3; /* Adding a bottom border for the container */
 }
 
 .periodButtons button {
-  background-color: #f1f1f1;
+  flex: 1;
+  margin: 0 5px; /* Adjust the margin between buttons */
+  padding: 10px 0; /* Adjust padding for the buttons */
   border: none;
-  padding: 10px 20px;
-  margin: 0 10px;
+  background: none; /* Remove default button styling */
+  color: black; /* Button text color */
+  font-size: 16px; /* Adjust the font size as needed */
   cursor: pointer;
-  font-size: 1em;
+  transition: color 0.3s ease, border-bottom 0.3s ease;
+  position: relative;
+}
+
+.periodButtons button::after {
+  content: '';
+  display: block;
+  width: 0;
+  height: 2px;
+  background: #00c807; /* Line color */
+  transition: width 0.3s;
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.periodButtons button:hover::after,
+.periodButtons button:focus::after {
+  width: 100%;
 }
 
 .periodButtons button:hover {
-  background-color: #ddd;
+  color: #00c807; /* Change text color on hover */
+}
+
+.periodButtons button:focus {
+  outline: none;
+  color: #00c807; /* Change text color on focus */
 }
 
 .orderSection {
@@ -73,11 +99,7 @@
   background-color: #fff;
   transition: box-shadow 0.3s ease;
   box-shadow: 0px 16px 20px rgba(0, 0, 0, 0.2);
-
 }
-
-/* .orderSection:hover {
-} */
 
 .orderSection h2 {
   font-size: 1.5em;
@@ -118,15 +140,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* border: 2px solid #e0e0e0; */
   border-radius: 8px;
-
 }
 
 .addToWatchlistButton {
   padding: 10px 20px;
   font-size: 1em;
-  /* background-color: #007bff; */
   color: #00C806;
   border: none;
   cursor: pointer;
@@ -163,9 +182,8 @@
   margin: 5px 0;
 }
 
-.buyingPowerMessage{
-    border-top: 1px solid;
-    /* border-bottom: 1px solid; */
-    padding: 2px;
-    margin-top: 19px;
+.buyingPowerMessage {
+  border-top: 1px solid;
+  padding: 2px;
+  margin-top: 19px;
 }

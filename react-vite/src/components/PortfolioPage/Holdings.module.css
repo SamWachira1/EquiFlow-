@@ -5,7 +5,9 @@
   
   .leftColumn {
     flex: 2;
-    padding: 20px;
+    padding: 0px;
+    margin-left: 1em;
+    /* border-bottom: 2px solid lightgrey; */
   }
   
   .rightColumn {

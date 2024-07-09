@@ -2,8 +2,7 @@
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { getHoldingsThunk } from '../../redux/holdings';
-// import PortfolioGraph from '../components/PortfolioGraph';
-// import Watchlists from '../components/Watchlists';
+import PortfolioGraph from '../PortfolioChart';
 import PortfolioWatchlists from '../PortfolioWatchlist';
 import styles from './Holdings.module.css';
 
@@ -17,7 +16,7 @@ const PortfolioPage = () => {
   return (
     <div className={styles.portfolioPage}>
       <div className={styles.leftColumn}>
-        {/* <PortfolioGraph /> */}
+        <PortfolioGraph />
         {/* Other components like Buying Power, Daily Movers, News */}
       </div>
       <div className={styles.rightColumn}>

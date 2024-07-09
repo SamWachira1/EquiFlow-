@@ -20,7 +20,7 @@ import { fetchSearchResults } from '../../redux/search';
 
 import { buyHoldingThunk, sellHoldingThunk, getHoldingsThunk } from '../../redux/holdings';
 import { thunkAuthenticate } from '../../redux/session'; // Import the authentication thunk
-import RechartsAreaChart from '../Recharts';
+import RechartsAreaChart from '../SecruityPageChart/Recharts';
 import LoadingSpinner from '../LoadingSpinner';
 import { useModal } from '../../context/Modal';
 import WatchlistModal from '../WatchlistModal/WatchlistModal';
@@ -42,7 +42,7 @@ const SecuritiesPage = () => {
 
   const { historicalData, fundamentalData, realTimeData } = useSelector((state) => state.securities);
   const { user } = useSelector((state) => state.session);
-  const holdings = useSelector((state) => state.holdings); // Add holdings from state
+  const holdings = useSelector((state) => state.holdings.holdings); // Add holdings from state
   const { setModalContent, closeModal } = useModal();
   const buyingPower = user?.buying_power ? user.buying_power.toFixed(2) : '0.00'; // Round buying power
   const securityId = useSelector((state) => state.search?.selectedSecurity.id);

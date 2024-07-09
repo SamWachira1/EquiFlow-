@@ -1,0 +1,51 @@
+.portfolioGraph {
+  width: 100%;
+  height: 400px; /* Adjust the height as needed */
+}
+
+.dateRangeButtons {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0; /* Adjust the padding as needed */
+  border-bottom: 1px solid #d3d3d3; /* Adding a bottom border for the container */
+}
+
+.dateRangeButtons button {
+  flex: 1;
+  margin: 0 5px; /* Adjust the margin between buttons */
+  padding: 10px 0; /* Adjust padding for the buttons */
+  border: none;
+  background: none; /* Remove default button styling */
+  color: black; /* Button text color */
+  font-size: 16px; /* Adjust the font size as needed */
+  cursor: pointer;
+  transition: color 0.3s ease, border-bottom 0.3s ease;
+  position: relative;
+}
+
+.dateRangeButtons button::after {
+  content: '';
+  display: block;
+  width: 0;
+  height: 2px;
+  background: #00c807; /* Line color */
+  transition: width 0.3s;
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.dateRangeButtons button:hover::after,
+.dateRangeButtons button:focus::after {
+  width: 100%;
+}
+
+.dateRangeButtons button:hover {
+  color: #00c807; /* Change text color on hover */
+}
+
+.dateRangeButtons button:focus {
+  outline: none;
+  color: #00c807; /* Change text color on focus */
+}

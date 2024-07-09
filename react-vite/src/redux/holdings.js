@@ -7,6 +7,9 @@ import { updateBuyingPower } from './session'; // Import the updateBuyingPower a
 const GET_HOLDINGS = "holdings/get_holdings";
 const BUY_HOLDING = "holdings/buy_holding";
 const SELL_HOLDING = "holdings/sell_holding";
+const GET_COMBINED_HISTORICAL_DATA = "holdings/get_combined_historical_data";
+const FETCH_HOLDINGS_DATA_FAILURE = "holdings/fetchHoldingsDataFailure";
+
 
 // Action Creators
 const action = (type, payload) => ({
@@ -82,6 +85,74 @@ export const sellHoldingThunk = (stockSymbol, shares, sellPrice) => async (dispa
         // Handle error accordingly, maybe dispatch an error action
     }
 };
+
+export const getCombinedHistoricalDataThunk = () => async (dispatch) => {
+    try {
+        const response = await fetch('/api/holdings/combined_historical_data', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            dispatch(action(GET_COMBINED_HISTORICAL_DATA, data));
+            return data;
+        } else {
+            const errorText = await response.text();
+            console.error('Failed to fetch combined historical data:', response.status, response.statusText, errorText);
+        }
+    } catch (error) {
+        console.log('Error fetching combined historical data:', error);
+    }
+};
+
+export const fetchCombinedHistoricalData1W = () => async (dispatch) => {
+    await fetchDataThunk('/api/holdings/combined_historical_data_1w', dispatch);
+};
+
+export const fetchCombinedHistoricalData1M = () => async (dispatch) => {
+    await fetchDataThunk('/api/holdings/combined_historical_data_1m', dispatch);
+};
+
+export const fetchCombinedHistoricalData3M = () => async (dispatch) => {
+    await fetchDataThunk('/api/holdings/combined_historical_data_3m', dispatch);
+};
+
+export const fetchCombinedHistoricalDataYTD = () => async (dispatch) => {
+    await fetchDataThunk('/api/holdings/combined_historical_data_ytd', dispatch);
+};
+
+export const fetchCombinedHistoricalData1Y = () => async (dispatch) => {
+    await fetchDataThunk('/api/holdings/combined_historical_data_1y', dispatch);
+};
+
+
+const fetchDataThunk = async (url, dispatch) => {
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            dispatch(action(GET_COMBINED_HISTORICAL_DATA, data));
+            return data;
+        } else {
+            const errorText = await response.text();
+            console.error(`Failed to fetch combined historical data from ${url}:`, response.status, response.statusText, errorText);
+            dispatch(action(FETCH_HOLDINGS_DATA_FAILURE, errorText));
+        }
+    } catch (error) {
+        console.log(`Error fetching combined historical data from ${url}:`, error);
+        dispatch(action(FETCH_HOLDINGS_DATA_FAILURE, error.message));
+    }
+};
+
 // Selectors
 const getHoldings = (state) => state.holdings;
 
@@ -91,19 +162,29 @@ export const getMemoizedHoldings = createSelector(
 );
 
 // Reducer
-const initialState = [];
+const initialState = {
+    holdings: [],
+    combinedHistoricalData: {} // Initial state for combined historical data
+};
 
 const holdingsReducer = (state = initialState, action) => {
     switch (action.type) {
         case GET_HOLDINGS:
-            return action.payload;
+            return { ...state, holdings: action.payload };
         case BUY_HOLDING:
-            return [...state, action.payload];
+            return { ...state, holdings: [...state.holdings, action.payload] };
         case SELL_HOLDING:
-            return state.filter(holding => holding.id !== action.payload.id).concat(action.payload);
+            return { 
+                ...state, 
+                holdings: state.holdings.filter(holding => holding.id !== action.payload.id).concat(action.payload) 
+            };
+        case GET_COMBINED_HISTORICAL_DATA: // New case for combined historical data
+            return { ...state, combinedHistoricalData: action.payload };
+
+        case FETCH_HOLDINGS_DATA_FAILURE:
+                return { ...state, error: action.payload };
         default:
             return state;
     }
 };
-
 export default holdingsReducer;

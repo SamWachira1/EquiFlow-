@@ -33,9 +33,7 @@ const PortfolioWatchlists = () => {
     }
   };
 
-  if (!watchlists || Object.keys(watchlists).length === 0) {
-    return <div>Loading...</div>; // or some other loading indicator
-  }
+
 
   return (
     user ? (
