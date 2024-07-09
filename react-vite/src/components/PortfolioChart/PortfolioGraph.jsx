@@ -16,6 +16,7 @@ const PortfolioGraph = () => {
   const dispatch = useDispatch();
   const combinedHistoricalData = useSelector((state) => state.holdings.combinedHistoricalData);
   const holdings = useSelector((state) => state.holdings.holdings || []);
+  const user = useSelector((state)=> state.session.user )
   const [portfolioValue, setPortfolioValue] = useState([]);
   const [loadingChart, setLoadingChart] = useState(true);
   const [dateRange, setDateRange] = useState('1Y'); // Default to 1 Year
@@ -82,7 +83,7 @@ const PortfolioGraph = () => {
 
 
   return (
-    <div className={styles.portfolioGraph}>
+    user ? (<div className={styles.portfolioGraph}>
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={formattedData} margin={{ top: 20, right: 30, bottom: 30, left: 0 }}>
           <defs>
@@ -104,7 +105,7 @@ const PortfolioGraph = () => {
         <button onClick={() => setDateRange('YTD')}>YTD</button>
         <button onClick={() => setDateRange('1Y')}>1Y</button>
       </div>
-    </div>
+    </div>) : null 
   );
 };
 
