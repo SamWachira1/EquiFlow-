@@ -85,7 +85,7 @@ const PortfolioGraph = () => {
     user ? (
       <div className={styles.portfolioGraph}>
         <div className={styles.priceDisplay}>
-          <div>${currentPrice.toFixed(2)}</div>
+        <div>${currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
         </div>
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={formattedData} margin={{ top: 20, right: 30, bottom: 30, left: 0 }}
