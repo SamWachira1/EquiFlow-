@@ -19,8 +19,8 @@ const PortfolioGraph = () => {
   const user = useSelector((state)=> state.session.user )
   const [portfolioValue, setPortfolioValue] = useState([]);
   const [loadingChart, setLoadingChart] = useState(true);
+  const [currentPrice, setCurrentPrice] = useState(0);
   const [dateRange, setDateRange] = useState('1Y'); // Default to 1 Year
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,9 +42,7 @@ const PortfolioGraph = () => {
     fetchData();
   }, [dispatch, dateRange]);
 
-
   useEffect(() => {
- 
     if (Array.isArray(holdings) && holdings.length > 0 && Object.keys(combinedHistoricalData).length > 0) {
       calculatePortfolioValue();
     }
@@ -52,8 +50,6 @@ const PortfolioGraph = () => {
 
   const calculatePortfolioValue = () => {
     const dates = Object.keys(combinedHistoricalData);
-
-
     const values = dates.map((date) => {
       const totalValue = holdings.reduce((acc, holding) => {
         const price = combinedHistoricalData[date][holding.symbol]?.close || 0;
@@ -61,16 +57,20 @@ const PortfolioGraph = () => {
       }, 0);
       return { date, value: totalValue };
     });
-
     setPortfolioValue(values);
   };
-
 
   const formattedData = portfolioValue.map((data) => ({
     date: new Date(data.date).toLocaleDateString('en-US'),
     close: data.value,
   }));
 
+  const handleMouseMove = (e) => {
+    if (e && e.activePayload && e.activePayload.length > 0) {
+      const newPrice = e.activePayload[0].payload.close;
+      setCurrentPrice(newPrice);
+    }
+  };
 
 
   if (user && loadingChart) {
@@ -81,31 +81,36 @@ const PortfolioGraph = () => {
     );
   }
 
-
   return (
-    user ? (<div className={styles.portfolioGraph}>
-      <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={formattedData} margin={{ top: 20, right: 30, bottom: 30, left: 0 }}>
-          <defs>
-            <linearGradient id="colorClose" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#00C807" stopOpacity={0.8} />
-              <stop offset="95%" stopColor="#00C807" stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          <XAxis dataKey="date" tickFormatter={(tick) => tick.split('/')[1]} hide={true} axisLine={{ stroke: '#d3d3d3' }} tickLine={false} />
-          <YAxis domain={['auto', 'auto']} hide={true} axisLine={{ stroke: '#d3d3d3' }} tickLine={false} />
-          <Tooltip />
-          <Area type="monotone" dataKey="close" stroke="#84d884" fillOpacity={1} fill="url(#colorClose)" />
-        </AreaChart>
-      </ResponsiveContainer>
-      <div className={styles.dateRangeButtons}>
-        <button onClick={() => setDateRange('1W')}>1W</button>
-        <button onClick={() => setDateRange('1M')}>1M</button>
-        <button onClick={() => setDateRange('3M')}>3M</button>
-        <button onClick={() => setDateRange('YTD')}>YTD</button>
-        <button onClick={() => setDateRange('1Y')}>1Y</button>
+    user ? (
+      <div className={styles.portfolioGraph}>
+        <div className={styles.priceDisplay}>
+          <div>${currentPrice.toFixed(2)}</div>
+        </div>
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={formattedData} margin={{ top: 20, right: 30, bottom: 30, left: 0 }}
+            onMouseMove={handleMouseMove}>
+            <defs>
+              <linearGradient id="colorClose" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#00C807" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="#00C807" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <XAxis dataKey="date" tickFormatter={(tick) => tick.split('/')[1]} hide={true} axisLine={{ stroke: '#d3d3d3' }} tickLine={false} />
+            <YAxis domain={['auto', 'auto']} hide={true} axisLine={{ stroke: '#d3d3d3' }} tickLine={false} />
+            <Tooltip />
+            <Area type="monotone" dataKey="close" stroke="#84d884" fillOpacity={1} fill="url(#colorClose)" />
+          </AreaChart>
+        </ResponsiveContainer>
+        <div className={styles.dateRangeButtons}>
+          <button onClick={() => setDateRange('1W')}>1W</button>
+          <button onClick={() => setDateRange('1M')}>1M</button>
+          <button onClick={() => setDateRange('3M')}>3M</button>
+          <button onClick={() => setDateRange('YTD')}>YTD</button>
+          <button onClick={() => setDateRange('1Y')}>1Y</button>
+        </div>
       </div>
-    </div>) : null 
+    ) : null
   );
 };
 
