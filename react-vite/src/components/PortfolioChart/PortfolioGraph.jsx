@@ -73,7 +73,7 @@ const PortfolioGraph = () => {
 
 
 
-  if (loadingChart) {
+  if (user && loadingChart) {
     return (
       <div className={styles.loadingContainer}>
         <LoadingSpinner />
