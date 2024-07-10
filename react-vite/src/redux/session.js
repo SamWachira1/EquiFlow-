@@ -69,6 +69,20 @@ export const thunkLogout = () => async (dispatch) => {
   dispatch(removeUser());
 };
 
+
+export const thunkUpdateBuyingPower = (amount) => async (dispatch) => {
+  const response = await fetch("/api/users/update-buying-power", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ amount })
+  });
+
+  if (response.ok) {
+    const data = await response.json();
+    dispatch(updateBuyingPower(data.buying_power));
+  }
+}
+
 const initialState = { user: null };
 
 function sessionReducer(state = initialState, action) {

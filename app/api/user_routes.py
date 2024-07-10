@@ -1,6 +1,6 @@
-from flask import Blueprint, jsonify
-from flask_login import login_required
-from app.models import User
+from flask import Blueprint, request, jsonify
+from flask_login import login_required, current_user
+from app.models import User, db
 
 user_routes = Blueprint('users', __name__)
 
@@ -23,3 +23,14 @@ def user(id):
     """
     user = User.query.get(id)
     return user.to_dict()
+
+@user_routes.route('/update-buying-power', methods=['PUT'])
+@login_required
+def update_buying_power():
+    amount = request.json.get('amount')
+    if amount is None:
+        return jsonify({"error": "Amount is required"}), 400
+
+    current_user.buying_power += amount
+    db.session.commit()
+    return jsonify(current_user.to_dict()), 200
