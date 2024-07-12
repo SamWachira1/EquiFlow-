@@ -29,9 +29,13 @@
     font-size: 35px;
     position: absolute;
     animation: fadeIn 1s ease-in-out;
- 
+    background: linear-gradient(to right, #1e3c72, #2a5298, #76b852); /* Updated gradient */
+    -webkit-background-clip: text;
+    color: transparent;
+  
     margin-left: 2em;
 }
+
 
 .logoImage {
     width: 30em;

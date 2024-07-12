@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { thunkLogin } from "../../redux/session";
 import { useDispatch } from "react-redux";
 import { useModal } from "../../context/Modal";
-import "./LoginForm.css";
+import styles from './LoginForm.module.css';
 
 function LoginFormModal() {
   const dispatch = useDispatch();
@@ -10,6 +10,7 @@ function LoginFormModal() {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
   const { closeModal } = useModal();
+  const modalRef = useRef();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,33 +29,50 @@ function LoginFormModal() {
     }
   };
 
+  const handleClickOutside = (event) => {
+    if (modalRef.current && !modalRef.current.contains(event.target)) {
+      closeModal();
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
-    <>
-      <h1>Log In</h1>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Email
-          <input
-            type="text"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </label>
-        {errors.email && <p>{errors.email}</p>}
-        <label>
-          Password
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </label>
-        {errors.password && <p>{errors.password}</p>}
-        <button type="submit">Log In</button>
-      </form>
-    </>
+    <div className={styles.modal}>
+      <div className={styles.modalContent} ref={modalRef}>
+        <h1>Log In</h1>
+        <form onSubmit={handleSubmit}>
+          <div className={styles.inputGroup}>
+            <label htmlFor="email">Email</label>
+            <input
+              id="email"
+              type="text"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            {errors.email && <p className={styles.error}>{errors.email}</p>}
+          </div>
+          <div className={styles.inputGroup}>
+            <label htmlFor="password">Password</label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            {errors.password && <p className={styles.error}>{errors.password}</p>}
+          </div>
+          <button type="submit" className={styles.submitButton}>Log In</button>
+        </form>
+      </div>
+    </div>
   );
 }
 
