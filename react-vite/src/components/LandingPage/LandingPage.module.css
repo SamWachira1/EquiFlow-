@@ -29,12 +29,14 @@
     font-size: 35px;
     position: absolute;
     animation: fadeIn 1s ease-in-out;
+ 
+    margin-left: 2em;
 }
 
 .logoImage {
     width: 30em;
     height: auto;
-    margin-left: 12em;
+    margin-left: 16em;
     margin-bottom: 5em;
 }
 
@@ -58,7 +60,7 @@
   background-color: #fff;
   padding: 1em;
   border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1); /* Less blurred */
   opacity: 0;
   animation: fadeIn 1s ease-in-out forwards;
 }
