@@ -16,14 +16,13 @@ ENV FLASK_ENV=$FLASK_ENV
 ENV DATABASE_URL=$DATABASE_URL
 ENV SCHEMA=$SCHEMA
 ENV SECRET_KEY=$SECRET_KEY
-# Ensure the correct Redis URL scheme
 ENV CACHE_REDIS_URL="redis://${CACHE_REDIS_URL}"
 
 WORKDIR /var/www
 
 # Copy requirements and install dependencies
 COPY requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt && pip install psycopg2
 
 # Copy the rest of the application code
 COPY . .
