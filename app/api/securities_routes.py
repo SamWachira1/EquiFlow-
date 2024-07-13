@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify
 from datetime import datetime, timedelta
+from app import cache
 import requests
 import os
 import io
@@ -60,52 +61,61 @@ def fetch_real_time_data(symbol):
 
 @securities_routes.route('/historical/1d/<symbol>', methods=['GET'])
 
+@securities_routes.route('/historical/1d/<symbol>', methods=['GET'])
+@cache.cached(timeout=300)  # Cache for 5 minutes
 def get_1d_data(symbol):
     today = datetime.now()
     yesterday = today - timedelta(days=1)
     return fetch_yahoo_style_data(symbol, yesterday, today, period='d', interval='1m')
 
 @securities_routes.route('/historical/1w/<symbol>', methods=['GET'])
+@cache.cached(timeout=43200)  # Cache for 12 hours
 def get_1w_data(symbol):
     today = datetime.now()
     one_week_ago = today - timedelta(days=7)
     return fetch_yahoo_style_data(symbol, one_week_ago, today)
 
 @securities_routes.route('/historical/1m/<symbol>', methods=['GET'])
+@cache.cached(timeout=86400)  # Cache for 24 hours
 def get_1m_data(symbol):
     today = datetime.now()
     one_month_ago = today - timedelta(days=30)
     return fetch_yahoo_style_data(symbol, one_month_ago, today)
 
 @securities_routes.route('/historical/3m/<symbol>', methods=['GET'])
+@cache.cached(timeout=86400)  # Cache for 24 hours
 def get_3m_data(symbol):
     today = datetime.now()
     three_months_ago = today - timedelta(days=90)
     return fetch_yahoo_style_data(symbol, three_months_ago, today)
 
 @securities_routes.route('/historical/ytd/<symbol>', methods=['GET'])
+@cache.cached(timeout=86400)  # Cache for 24 hours
 def get_ytd_data(symbol):
     today = datetime.now()
     start_of_year = datetime(today.year, 1, 1)
     return fetch_yahoo_style_data(symbol, start_of_year, today)
 
 @securities_routes.route('/historical/1y/<symbol>', methods=['GET'])
+@cache.cached(timeout=86400)  # Cache for 24 hours
 def get_1y_data(symbol):
     today = datetime.now()
     one_year_ago = today - timedelta(days=365)
     return fetch_yahoo_style_data(symbol, one_year_ago, today)
 
 @securities_routes.route('/historical/5y/<symbol>', methods=['GET'])
+@cache.cached(timeout=604800)  # Cache for 7 days
 def get_5y_data(symbol):
     today = datetime.now()
     five_years_ago = today - timedelta(days=5*365)
     return fetch_yahoo_style_data(symbol, five_years_ago, today)
 
-
 @securities_routes.route('/fundamentals/<symbol>', methods=['GET'])
+@cache.cached(timeout=86400)  # Cache for 24 hours
 def get_fundamentals(symbol):
     return fetch_fundamental_data(symbol)
 
 @securities_routes.route('/real-time/<symbol>', methods=['GET'])
+@cache.cached(timeout=60)  # Cache for 1 minute
 def get_real_time(symbol):
     return fetch_real_time_data(symbol)
