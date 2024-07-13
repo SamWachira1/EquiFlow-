@@ -30,8 +30,16 @@ def create_app():
     db.init_app(app)
     Migrate(app, db)
 
-    redis_url = os.getenv('CACHE_REDIS_URL', 'redis://localhost:6379/0')
+    redis_url = os.getenv('CACHE_REDIS_URL')
+    if not redis_url.startswith(('redis://', 'rediss://', 'unix://')):
+        redis_url = 'redis://' + redis_url
+
+    if not redis_url.startswith(('redis://', 'rediss://', 'unix://')):
+        raise ValueError("Invalid Redis URL. Must specify one of the following schemes (redis://, rediss://, unix://)")
+
     cache.init_app(app, config={'CACHE_TYPE': 'redis', 'CACHE_REDIS_URL': redis_url})
+
+
     
     # Register blueprints
     from .api.user_routes import user_routes
