@@ -23,13 +23,15 @@ export const thunkAuthenticate = () => async (dispatch) => {
 	const response = await fetch("/api/auth/");
 	if (response.ok) {
 		const data = await response.json();
+
+    dispatch(setUser(data));
+    dispatch(getHoldingsThunk())
+    dispatch(getWatchlistsThunk())
 		if (data.errors) {
 			return;
 		}
 
-		dispatch(setUser(data));
-    dispatch(getHoldingsThunk())
-    dispatch(getWatchlistsThunk())
+		
 	}
 };
 

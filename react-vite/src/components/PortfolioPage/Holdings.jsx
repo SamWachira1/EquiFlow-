@@ -1,7 +1,5 @@
 // src/pages/PortfolioPage.js
-import { useEffect } from 'react';
-import { useDispatch, useSelector} from 'react-redux';
-import { getHoldingsThunk } from '../../redux/holdings';
+import { useSelector} from 'react-redux';
 import PortfolioGraph from '../PortfolioChart';
 import PortfolioWatchlists from '../PortfolioWatchlist';
 import BuyingPower from '../BuyingPower';
@@ -10,12 +8,7 @@ import styles from './Holdings.module.css';
 
 const PortfolioPage = () => {
   const user = useSelector((state)=> state.session.user)
-  const dispatch = useDispatch();
-  
 
-  useEffect(() => {
-    dispatch(getHoldingsThunk());
-  }, [dispatch]);
 
   return (
    user ? ( <div className={styles.portfolioPage}>

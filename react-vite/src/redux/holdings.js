@@ -9,12 +9,16 @@ const BUY_HOLDING = "holdings/buy_holding";
 const SELL_HOLDING = "holdings/sell_holding";
 const GET_COMBINED_HISTORICAL_DATA = "holdings/get_combined_historical_data";
 const FETCH_HOLDINGS_DATA_FAILURE = "holdings/fetchHoldingsDataFailure";
-
+const CLEAR_HOLDINGS = "holdings/clear_holdings";
 
 // Action Creators
 const action = (type, payload) => ({
     type,
     payload,
+});
+
+export const clearHoldingsData = () => ({
+    type: CLEAR_HOLDINGS,
 });
 
 // Thunks
@@ -183,8 +187,13 @@ const holdingsReducer = (state = initialState, action) => {
 
         case FETCH_HOLDINGS_DATA_FAILURE:
                 return { ...state, error: action.payload };
+
+        case CLEAR_HOLDINGS:
+            return { ...state, holdings: [], combinedHistoricalData: {} }; // Clear holdings and historical data
+        
         default:
             return state;
     }
 };
+
 export default holdingsReducer;

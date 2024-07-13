@@ -1,6 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchCombinedHistoricalData1W, fetchCombinedHistoricalData1M, fetchCombinedHistoricalData3M, fetchCombinedHistoricalDataYTD, fetchCombinedHistoricalData1Y } from '../../redux/holdings';
+import { 
+  getHoldingsThunk,
+  fetchCombinedHistoricalData1W, 
+  fetchCombinedHistoricalData1M, 
+  fetchCombinedHistoricalData3M, 
+  fetchCombinedHistoricalDataYTD, 
+  fetchCombinedHistoricalData1Y, 
+  clearHoldingsData 
+} from '../../redux/holdings';
 import LoadingSpinner from '../LoadingSpinner';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'recharts';
 import styles from './PortfolioGraph.module.css';
@@ -19,6 +27,7 @@ const PortfolioGraph = ({ height = 400 }) => {
   useEffect(() => {
     const fetchData = async () => {
       setLoadingChart(true);
+      dispatch(getHoldingsThunk())
       if (dateRange === '1W') {
         await dispatch(fetchCombinedHistoricalData1W());
       } else if (dateRange === '1M') {
@@ -33,12 +42,22 @@ const PortfolioGraph = ({ height = 400 }) => {
       setLoadingChart(false);
     };
 
-    fetchData();
-  }, [dispatch, dateRange]);
+    if (user) {
+      fetchData();
+    }
+
+    return () => {
+      dispatch(clearHoldingsData());
+    };
+  }, [dispatch, dateRange, user]);
 
   useEffect(() => {
     if (Array.isArray(holdings) && holdings.length > 0 && Object.keys(combinedHistoricalData).length > 0) {
       calculatePortfolioValue();
+    } else {
+      setPortfolioValue([]);
+      setCurrentPrice(0);
+      setDefaultPrice(0);
     }
   }, [combinedHistoricalData, holdings]);
 
@@ -74,7 +93,7 @@ const PortfolioGraph = ({ height = 400 }) => {
     }
   };
 
-  if (user && loadingChart) {
+  if (loadingChart) {
     return (
       <div className={styles.loadingContainer}>
         <LoadingSpinner />
