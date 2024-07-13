@@ -7,6 +7,8 @@ const UPDATE_WATCHLIST = "watchlist/update_watchlist";
 const DELETE_WATCHLIST = "watchlist/delete_watchlist";
 const ADD_STOCK_TO_WATCHLIST = "watchlist/add_stock_to_watchlist";
 const GET_WATCHLIST_DETAILS = 'watchlist/get_watchlist_details';
+const CLEAR_WATCHLIST = "watchlist/clear_watchlist";
+
 
 
 // Action Creators
@@ -142,6 +144,10 @@ export const getMemoizedWatchlists = createSelector(
     (watchlists) => Object.values(watchlists)
   );
 
+export const clearWatchlist = () => ({
+    type: CLEAR_WATCHLIST,
+  });
+
 
 const initialState = [];
 
@@ -161,7 +167,9 @@ const watchlistReducer = (state = initialState, action) => {
             return state.filter(watchlist => watchlist.id !== action.payload);
 
         case ADD_STOCK_TO_WATCHLIST:
-                return [...state, action.payload]
+            return [...state, action.payload]
+        case CLEAR_WATCHLIST:
+            return initialState; // Clear the watchlist state
                  
         default:
             return state;

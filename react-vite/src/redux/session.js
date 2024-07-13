@@ -1,3 +1,6 @@
+import { getWatchlistsThunk } from './watchlist';
+import { getHoldingsThunk } from './holdings';
+
 const SET_USER = 'session/setUser';
 const REMOVE_USER = 'session/removeUser';
 const UPDATE_BUYING_POWER = 'session/updateBuyingPower';
@@ -25,6 +28,8 @@ export const thunkAuthenticate = () => async (dispatch) => {
 		}
 
 		dispatch(setUser(data));
+    dispatch(getHoldingsThunk())
+    dispatch(getWatchlistsThunk())
 	}
 };
 
