@@ -1,0 +1,15 @@
+.notFoundContainer {
+    text-align: center;
+    padding: 50px;
+  }
+  
+  .notFoundContainer h1 {
+    font-size: 5em;
+    margin-bottom: 20px;
+  }
+  
+  .notFoundContainer p {
+    font-size: 1.5em;
+    margin: 10px 0;
+  }
+  

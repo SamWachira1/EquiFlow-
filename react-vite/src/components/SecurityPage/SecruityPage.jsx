@@ -24,6 +24,8 @@ import RechartsAreaChart from '../SecruityPageChart/Recharts';
 import LoadingSpinner from '../LoadingSpinner';
 import { useModal } from '../../context/Modal';
 import WatchlistModal from '../WatchlistModal/WatchlistModal';
+import SecurityNotFound from '../SecurityNotFound';
+
 import styles from './SecuritiesPage.module.css';
 
 const SecuritiesPage = () => {
@@ -46,18 +48,22 @@ const SecuritiesPage = () => {
   const { setModalContent, closeModal } = useModal();
   const buyingPower = user?.buying_power ? user.buying_power.toFixed(2) : '0.00'; // Round buying power
   const securityId = useSelector((state) => state.search?.selectedSecurity.id);
+  const [loadingData, setLoadingData] = useState(true);
 
 
 
   useEffect(() => {
     const fetchData = async () => {
       setLoadingChart(true);
+      setLoadingData(true);
       await dispatch(fetchHistoricalData1D(symbol)); // Fetch 1D data by default
       await dispatch(fetchFundamentalData(symbol));
       await dispatch(fetchRealTimeData(symbol));
       await dispatch(fetchSearchResults(symbol))
 
       setLoadingChart(false);
+      setLoadingData(false);
+
     };
 
     fetchData();
@@ -186,6 +192,14 @@ const SecuritiesPage = () => {
     dispatch(getHoldingsThunk()); // Refresh holdings data
 
   };
+
+  if (loadingData) {
+    return <LoadingSpinner />;
+  }
+
+  if (!general.Name || closePrice==='NA'|| closePrice === '-') {
+    return <SecurityNotFound />;
+  }
   
   return (
     user ? (
