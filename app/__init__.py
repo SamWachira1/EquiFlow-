@@ -29,8 +29,10 @@ def create_app():
     app.config.from_object(Config)
     db.init_app(app)
     Migrate(app, db)
-    cache.init_app(app, config={'CACHE_TYPE': 'redis', 'CACHE_REDIS_URL': 'redis://localhost:6379/0'})
 
+    redis_url = os.getenv('CACHE_REDIS_URL', 'redis://localhost:6379/0')
+    cache.init_app(app, config={'CACHE_TYPE': 'redis', 'CACHE_REDIS_URL': redis_url})
+    
     # Register blueprints
     from .api.user_routes import user_routes
     from .api.auth_routes import auth_routes

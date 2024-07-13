@@ -9,6 +9,8 @@ ARG FLASK_ENV
 ARG DATABASE_URL
 ARG SCHEMA
 ARG SECRET_KEY
+ARG CACHE_REDIS_URL
+
 
 WORKDIR /var/www
 
@@ -22,4 +24,3 @@ COPY . .
 RUN flask db upgrade
 RUN flask seed all
 CMD ["gunicorn", "--bind", "0.0.0.0:10000", "app:create_app()"]
-
