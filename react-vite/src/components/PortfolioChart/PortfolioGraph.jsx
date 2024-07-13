@@ -1,25 +1,19 @@
-// src/components/PortfolioGraph.js
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-// import { getCombinedHistoricalDataThunk } from '../../redux/holdings';
-import { fetchCombinedHistoricalData1W,
-fetchCombinedHistoricalData1M,
-fetchCombinedHistoricalData3M,
-fetchCombinedHistoricalDataYTD,
-fetchCombinedHistoricalData1Y
-} from '../../redux/holdings';
+import { fetchCombinedHistoricalData1W, fetchCombinedHistoricalData1M, fetchCombinedHistoricalData3M, fetchCombinedHistoricalDataYTD, fetchCombinedHistoricalData1Y } from '../../redux/holdings';
 import LoadingSpinner from '../LoadingSpinner';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'recharts';
 import styles from './PortfolioGraph.module.css';
 
-const PortfolioGraph = () => {
+const PortfolioGraph = ({ height = 400 }) => {
   const dispatch = useDispatch();
   const combinedHistoricalData = useSelector((state) => state.holdings.combinedHistoricalData);
   const holdings = useSelector((state) => state.holdings.holdings || []);
-  const user = useSelector((state)=> state.session.user )
+  const user = useSelector((state) => state.session.user);
   const [portfolioValue, setPortfolioValue] = useState([]);
   const [loadingChart, setLoadingChart] = useState(true);
   const [currentPrice, setCurrentPrice] = useState(0);
+  const [defaultPrice, setDefaultPrice] = useState(0);
   const [dateRange, setDateRange] = useState('1Y'); // Default to 1 Year
 
   useEffect(() => {
@@ -58,6 +52,12 @@ const PortfolioGraph = () => {
       return { date, value: totalValue };
     });
     setPortfolioValue(values);
+
+    if (values.length > 0) {
+      const latestValue = values[values.length - 1].value;
+      setCurrentPrice(latestValue);
+      setDefaultPrice(latestValue);
+    }
   };
 
   const formattedData = portfolioValue.map((data) => ({
@@ -69,9 +69,10 @@ const PortfolioGraph = () => {
     if (e && e.activePayload && e.activePayload.length > 0) {
       const newPrice = e.activePayload[0].payload.close;
       setCurrentPrice(newPrice);
+    } else {
+      setCurrentPrice(defaultPrice);
     }
   };
-
 
   if (user && loadingChart) {
     return (
@@ -85,11 +86,10 @@ const PortfolioGraph = () => {
     user ? (
       <div className={styles.portfolioGraph}>
         <div className={styles.priceDisplay}>
-        <div>${currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+          <div>${currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
         </div>
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={formattedData} margin={{ top: 20, right: 30, bottom: 30, left: 0 }}
-            onMouseMove={handleMouseMove}>
+        <ResponsiveContainer width="100%" height={height}>
+          <AreaChart data={formattedData} margin={{ top: 80, right: 30, bottom: 30, left: 0 }} onMouseMove={handleMouseMove}>
             <defs>
               <linearGradient id="colorClose" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#00C807" stopOpacity={0.8} />

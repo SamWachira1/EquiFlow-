@@ -63,17 +63,21 @@ const PortfolioWatchlists = () => {
                 <div className={styles.loader}></div>
               ) : (
                 <ul className={styles.watchlistItems}>
-                  {watchlist.securities.map((security) => (
-                    <li key={security.symbol} className={styles.securityItem}>
-                      <div className={styles.securityDetails}>
-                        <span className={styles.securitySymbol}>{security.symbol}</span>
-                        <span className={styles.securityPrice}>${security.price.toFixed(2)}</span>
-                        <span className={styles.securityChange} style={{ color: security.changePercent >= 0 ? 'green' : 'red' }}>
-                          {security.changePercent.toFixed(2)}%
-                        </span>
-                      </div>
-                    </li>
-                  ))}
+                  {watchlist?.securities && watchlist.securities.length > 0 ? (
+                    watchlist.securities.map((security) => (
+                      <li key={security.symbol} className={styles.securityItem}>
+                        <div className={styles.securityDetails}>
+                          <span className={styles.securitySymbol}>{security.symbol}</span>
+                          <span className={styles.securityPrice}>${security.price.toFixed(2)}</span>
+                          <span className={styles.securityChange} style={{ color: security.changePercent >= 0 ? 'green' : 'red' }}>
+                            {security.changePercent.toFixed(2)}%
+                          </span>
+                        </div>
+                      </li>
+                    ))
+                  ) : (
+                    <div>No securities in this watchlist.</div>
+                  )}
                 </ul>
               )
             )}

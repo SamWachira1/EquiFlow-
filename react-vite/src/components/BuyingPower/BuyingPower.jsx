@@ -1,27 +1,31 @@
 // src/components/BuyingPower.js
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateBuyingPower } from '../../redux/session';
 import { thunkUpdateBuyingPower } from '../../redux/session';
 import { FaChevronDown, FaChevronUp, FaInfoCircle } from 'react-icons/fa';
 import styles from './BuyingPower.module.css';
 
 const BuyingPower = () => {
-    const dispatch = useDispatch();
-    const user = useSelector((state) => state.session.user);
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const [depositAmount, setDepositAmount] = useState('');
-  
-    const handleDeposit = () => {
-      const amount = parseFloat(depositAmount);
-      if (!isNaN(amount) && amount > 0) {
-        dispatch(thunkUpdateBuyingPower(amount));
-        setDepositAmount('');
-      }
-    };
-  
-    return (
-      user ? (<div className={styles.buyingPower}>
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.session.user);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [depositAmount, setDepositAmount] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleDeposit = () => {
+    const amount = parseFloat(depositAmount.trim());
+    if (!isNaN(amount) && amount > 0) {
+      dispatch(thunkUpdateBuyingPower(amount));
+      setDepositAmount('');
+      setErrorMessage('');
+    } else {
+      setErrorMessage('*Please enter deposit amount');
+    }
+  };
+
+  return (
+    user ? (
+      <div className={styles.buyingPower}>
         <div className={styles.header} onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
           <div className={styles.headerLeft}>
             <span>Buying power</span>
@@ -42,6 +46,7 @@ const BuyingPower = () => {
               <div>Total</div>
               <div>${user.buying_power.toLocaleString()}</div>
             </div>
+            {errorMessage && <div className={styles.error}>{errorMessage}</div>}
             <div className={styles.actions}>
               <input
                 type="number"
@@ -53,9 +58,9 @@ const BuyingPower = () => {
             </div>
           </div>
         )}
-      </div>) : null 
-    );
-  };
-  
+      </div>
+    ) : null
+  );
+};
 
 export default BuyingPower;

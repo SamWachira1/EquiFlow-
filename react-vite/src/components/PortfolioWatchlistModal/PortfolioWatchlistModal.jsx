@@ -9,8 +9,13 @@ const PortfolioWatchlistModal = ({ onClose }) => {
   const [newWatchlistName, setNewWatchlistName] = useState('');
   const [editMode, setEditMode] = useState(false);
   const [editWatchlistId, setEditWatchlistId] = useState(null);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleCreateWatchlist = () => {
+    if (!newWatchlistName.trim()) {
+      setErrorMessage('*Name Required');
+      return;
+    }
     dispatch(createWatchlistThunk(newWatchlistName)).then(() => {
       setNewWatchlistName('');
       onClose();
@@ -18,6 +23,10 @@ const PortfolioWatchlistModal = ({ onClose }) => {
   };
 
   const handleUpdateWatchlist = () => {
+    if (!newWatchlistName.trim()) {
+      setErrorMessage('*Name Required');
+      return;
+    }
     dispatch(updateWatchlistThunk(editWatchlistId, newWatchlistName)).then(() => {
       setNewWatchlistName('');
       setEditMode(false);
@@ -46,15 +55,19 @@ const PortfolioWatchlistModal = ({ onClose }) => {
           <input
             type="text"
             value={newWatchlistName}
-            onChange={(e) => setNewWatchlistName(e.target.value)}
+            onChange={(e) => {
+              setNewWatchlistName(e.target.value);
+              setErrorMessage(''); // Clear error message on input change
+            }}
             placeholder="Watchlist name"
           />
           <button className={styles.createButton} onClick={handleSaveChanges}>
             {editMode ? 'Update Watchlist' : 'Create New List'}
           </button>
         </div>
+        {errorMessage && <div className={styles.error}>{errorMessage}</div>}
         <div className={styles.watchlistItems}>
-          {watchlists.map((watchlist) => (
+          {watchlists?.map((watchlist) => (
             <div key={watchlist.id} className={styles.watchlistItem}>
               <span>{watchlist.name}</span>
               <div className={styles.watchlistActions}>
@@ -62,6 +75,7 @@ const PortfolioWatchlistModal = ({ onClose }) => {
                   setEditMode(true);
                   setEditWatchlistId(watchlist.id);
                   setNewWatchlistName(watchlist.name);
+                  setErrorMessage(''); // Clear error message when editing
                 }}>Edit</button>
                 <button className={styles.deleteButton} onClick={() => handleDeleteWatchlist(watchlist.id)}>Delete</button>
               </div>
