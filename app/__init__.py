@@ -1,16 +1,23 @@
+# app/__init__.py
 import os
-from flask import Flask, render_template, request, session, redirect
+from flask import Flask, render_template, request, session, redirect, jsonify
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect, generate_csrf
 from flask_login import LoginManager
-from flask_caching import Cache
 from .models import db, User
 from .seeds import seed_commands
 from .config import Config
+from .cache import cache  # Import the cache object
 
-# Initialize cache object without binding it to an app
-cache = Cache()
+# Register blueprints
+from .api.user_routes import user_routes
+from .api.auth_routes import auth_routes
+from .api.search_routes import search_routes
+from .api.securities_routes import securities_routes
+from .api.watchlist_routes import watchlist_routes
+from .api.holdings_routes import holding_routes
+from .api.transactions_routes import transaction_routes
 
 def create_app():
     app = Flask(__name__, static_folder='../react-vite/dist', static_url_path='/')
@@ -27,29 +34,11 @@ def create_app():
     app.cli.add_command(seed_commands)
 
     app.config.from_object(Config)
-    db.init_app(app)
-    Migrate(app, db)
 
-    redis_url = os.getenv('CACHE_REDIS_URL')
-    if not redis_url.startswith(('redis://', 'rediss://', 'unix://')):
-        redis_url = 'redis://' + redis_url
+    # Initialize Flask-Caching
+    cache.init_app(app)  # Initialize cache with the app
 
-    if not redis_url.startswith(('redis://', 'rediss://', 'unix://')):
-        raise ValueError("Invalid Redis URL. Must specify one of the following schemes (redis://, rediss://, unix://)")
-
-    cache.init_app(app, config={'CACHE_TYPE': 'redis', 'CACHE_REDIS_URL': redis_url})
-
-
-    
     # Register blueprints
-    from .api.user_routes import user_routes
-    from .api.auth_routes import auth_routes
-    from .api.search_routes import search_routes
-    from .api.securities_routes import securities_routes
-    from .api.watchlist_routes import watchlist_routes
-    from .api.holdings_routes import holding_routes
-    from .api.transactions_routes import transaction_routes
-
     app.register_blueprint(user_routes, url_prefix='/api/users')
     app.register_blueprint(auth_routes, url_prefix='/api/auth')
     app.register_blueprint(search_routes, url_prefix='/api/search')
@@ -58,9 +47,13 @@ def create_app():
     app.register_blueprint(holding_routes, url_prefix='/api/holdings')
     app.register_blueprint(transaction_routes, url_prefix='/api/transactions')
 
+    db.init_app(app)
+    Migrate(app, db)
+
     # Application Security
     CORS(app)
 
+    # Redirect HTTP to HTTPS in production
     @app.before_request
     def https_redirect():
         if os.environ.get('FLASK_ENV') == 'production':
@@ -69,14 +62,14 @@ def create_app():
                 code = 301
                 return redirect(url, code=code)
 
+    # Inject CSRF token into cookies
     @app.after_request
     def inject_csrf_token(response):
         response.set_cookie(
             'csrf_token',
             generate_csrf(),
             secure=True if os.environ.get('FLASK_ENV') == 'production' else False,
-            samesite='Strict' if os.environ.get(
-                'FLASK_ENV') == 'production' else None,
+            samesite='Strict' if os.environ.get('FLASK_ENV') == 'production' else None,
             httponly=True)
         return response
 
@@ -107,4 +100,14 @@ def create_app():
     def not_found(e):
         return app.send_static_file('index.html')
 
+    @app.route('/test_redis')
+    def test_redis():
+        try:
+            cache.cache._client.ping()
+            return jsonify({'status': 'connected'})
+        except Exception as e:
+            return jsonify({'status': 'error', 'message': str(e)})
+
     return app
+
+app = create_app()
