@@ -1,4 +1,3 @@
-# Use an official Python runtime as a parent image
 FROM python:3.9.18-alpine3.18
 
 # Install build dependencies
@@ -30,23 +29,19 @@ ENV REDIS_USE_TLS=$REDIS_USE_TLS
 # Construct the Redis URL based on the environment variables
 ENV CACHE_REDIS_URL=${REDIS_USE_TLS:+rediss}://${REDIS_USER}:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}
 
-# Set the working directory
+
 WORKDIR /var/www
 
-# Copy the requirements file and install dependencies
+# Copy requirements and install dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt && pip install psycopg2-binary
+RUN pip install -r requirements.txt && pip install psycopg2
 
 # Copy the rest of the application code
 COPY . .
 
-# Ensure .env is copied
-COPY .env .env
-
 # Run database migrations and seed data
 RUN flask db upgrade
 RUN flask seed all
-
 
 # Start the application with Gunicorn
 CMD gunicorn app:app
