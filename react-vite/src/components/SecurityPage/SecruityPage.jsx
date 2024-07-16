@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -17,7 +17,6 @@ import {
 } from '../../redux/securities';
 
 import { fetchSearchResults } from '../../redux/search';
-
 import { buyHoldingThunk, sellHoldingThunk, getHoldingsThunk } from '../../redux/holdings';
 import { thunkAuthenticate } from '../../redux/session'; // Import the authentication thunk
 import RechartsAreaChart from '../SecruityPageChart/Recharts';
@@ -37,20 +36,18 @@ const SecuritiesPage = () => {
   const [estQuantity, setEstQuantity] = useState(0);
   const [showBuyingPowerMessage, setShowBuyingPowerMessage] = useState(false);
   const [orderType, setOrderType] = useState('buy');
-  const [buyIn, setBuyIn] = useState('usd');
   const [buttonText, setButtonText] = useState('Add to Watch List');
   const [isAdded, setIsAdded] = useState(false);
   const [availableShares, setAvailableShares] = useState(0); // Add state for available shares
+  const [errorMessage, setErrorMessage] = useState(''); // State for error message
 
   const { historicalData, fundamentalData, realTimeData } = useSelector((state) => state.securities);
   const { user } = useSelector((state) => state.session);
   const holdings = useSelector((state) => state.holdings.holdings); // Add holdings from state
   const { setModalContent, closeModal } = useModal();
   const buyingPower = user?.buying_power ? user.buying_power.toFixed(2) : '0.00'; // Round buying power
-  const securityId = useSelector((state) => state.search?.selectedSecurity.id);
+  const securityId = useSelector((state) => state.search?.selectedSecurity?.id);
   const [loadingData, setLoadingData] = useState(true);
-
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -63,7 +60,6 @@ const SecuritiesPage = () => {
 
       setLoadingChart(false);
       setLoadingData(false);
-
     };
 
     fetchData();
@@ -99,20 +95,24 @@ const SecuritiesPage = () => {
     fetchData();
   }, [period, dispatch, symbol]);
 
-  useEffect(() => {
+  const getHoldings = useCallback(() => {
     dispatch(getHoldingsThunk());
   }, [dispatch]);
 
   useEffect(() => {
+    getHoldings();
+  }, [getHoldings]);
+
+  useEffect(() => {
     const updateAvailableShares = async () => {
-  
       if (orderType === 'sell' && securityId !== null) {
+        await getHoldings();
         const holding = holdings.find(h => h.security_id === securityId);
         setAvailableShares(holding ? holding.shares.toFixed(2) : 0);
       }
     };
     updateAvailableShares();
-  }, [orderType, holdings, symbol, securityId, dispatch]);
+  }, [orderType, symbol, securityId, getHoldings]);
 
   const general = fundamentalData.General || {};
   const technicals = fundamentalData.Technicals || {};
@@ -146,51 +146,56 @@ const SecuritiesPage = () => {
 
   useEffect(() => {
     if (amount > 0 && closePrice !== '-') {
-      if (orderType === 'buy' && buyIn === 'usd') {
+      if (orderType === 'buy') {
         setEstQuantity((amount / closePrice).toFixed(6));
-      } else if (orderType === 'buy' && buyIn === 'shares') {
+      } else if (orderType === 'sell') {
         setEstQuantity(amount);
-      } else if (orderType === 'sell' && buyIn === 'usd') {
-        setEstQuantity(amount);
-      } else if (orderType === 'sell' && buyIn === 'shares') {
-        setEstQuantity((amount * closePrice).toFixed(2));
       } else {
         setEstQuantity(0);
       }
     } else {
       setEstQuantity(0);
     }
-  }, [amount, closePrice, orderType, buyIn]);
+  }, [amount, closePrice, orderType]);
 
   const handleReviewOrder = (e) => {
     e.preventDefault();
+    if (amount <= 0) {
+      setErrorMessage('Amount must be greater than zero.');
+      return;
+    }
+    if (orderType === 'sell' && amount > availableShares) {
+      setErrorMessage('You cannot sell more shares than you have.');
+      return;
+    }
     setShowBuyingPowerMessage(true);
+    setErrorMessage(''); // Clear error message
   };
 
   const handleSubmitOrder = async (e) => {
     e.preventDefault();
+    
+    if (amount <= 0) {
+      setErrorMessage('Amount must be greater than zero.');
+      return;
+    }
+    if (orderType === 'sell' && amount > availableShares) {
+      setErrorMessage('You cannot sell more shares than you have.');
+      return;
+    }
     
     const parsedAmount = parseFloat(amount);
     const parsedEstQuantity = parseFloat(estQuantity);
     const parsedClosePrice = parseFloat(closePrice);
   
     if (orderType === 'buy') {
-      if (buyIn === 'usd') {
-        await dispatch(buyHoldingThunk(symbol, general.Name, parsedEstQuantity, parsedClosePrice));
-      } else if (buyIn === 'shares') {
-        await dispatch(buyHoldingThunk(symbol, general.Name, parsedAmount, parsedClosePrice));
-      }
+      await dispatch(buyHoldingThunk(symbol, general.Name, parsedEstQuantity, parsedClosePrice));
     } else if (orderType === 'sell') {
-      if (buyIn === 'usd') {
-        await dispatch(sellHoldingThunk(symbol, parsedEstQuantity, parsedClosePrice));
-      } else if (buyIn === 'shares') {
-        await dispatch(sellHoldingThunk(symbol, parsedAmount, parsedClosePrice));
-      }
+      await dispatch(sellHoldingThunk(symbol, parsedAmount, parsedClosePrice));
     }
 
     await dispatch(thunkAuthenticate()); // Refresh user data
-    dispatch(getHoldingsThunk()); // Refresh holdings data
-
+    getHoldings(); // Refresh holdings data
   };
 
   if (loadingData) {
@@ -251,18 +256,14 @@ const SecuritiesPage = () => {
                 <option value="buy">Buy Order</option>
                 <option value="sell">Sell Order</option>
               </select>
-              <label>{orderType === 'buy' ? 'Buy In' : 'Sell In'}</label>
-              <select value={buyIn} onChange={(e) => setBuyIn(e.target.value)}>
-                <option value="usd">{orderType === 'buy' ? 'Dollars' : 'Shares'}</option>
-                <option value="shares">{orderType === 'buy' ? 'Shares' : 'Dollars'}</option>
-              </select>
-              <label>Amount</label>
+              <label>{orderType === 'buy' ? 'Amount in Dollars' : 'Amount in Shares'}</label>
               <input 
                 type="number" 
                 placeholder="0.00" 
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
               />
+              {errorMessage && <p className={styles.error}>{errorMessage}</p>}
               <p>{orderType === 'buy' ? `Est. Quantity: ${estQuantity}` : `Available Shares: ${availableShares}`}</p>
               <button type="submit">{showBuyingPowerMessage ? 'Submit Order' : 'Review Order'}</button>
             </form>
@@ -270,7 +271,6 @@ const SecuritiesPage = () => {
               <p className={styles.buyingPowerMessage}>${buyingPower} buying power available</p>
             )}
           </div>
-      
           <div className={styles.watchlistButtonContainer}>
             <button 
               onClick={openWatchlistModal} 

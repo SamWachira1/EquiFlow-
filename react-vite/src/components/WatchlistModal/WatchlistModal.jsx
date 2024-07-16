@@ -18,6 +18,7 @@ function WatchlistModal({ onClose, stock }) {
   const [editMode, setEditMode] = useState(false);
   const [editWatchlistId, setEditWatchlistId] = useState(null);
   const [isAdded, setIsAdded] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(''); // State for error message
 
   useEffect(() => {
     dispatch(getWatchlistsThunk());
@@ -32,11 +33,21 @@ function WatchlistModal({ onClose, stock }) {
   };
 
   const handleCreateWatchlist = () => {
+    if (!newWatchlistName.trim()) {
+      setErrorMessage('Please create a watchlist name.');
+      return;
+    }
+    setErrorMessage('');
     dispatch(createWatchlistThunk(newWatchlistName))
       .then(() => setNewWatchlistName(''));
   };
 
   const handleUpdateWatchlist = () => {
+    if (!newWatchlistName.trim()) {
+      setErrorMessage('Please create a watchlist name.');
+      return;
+    }
+    setErrorMessage('');
     dispatch(updateWatchlistThunk(editWatchlistId, newWatchlistName))
       .then(() => {
         setNewWatchlistName('');
@@ -74,6 +85,7 @@ function WatchlistModal({ onClose, stock }) {
             <button onClick={handleCreateWatchlist}>Create New List</button>
           )}
         </div>
+        {errorMessage && <p className={styles.error}>{errorMessage}</p>} {/* Display error message */}
         <div className={styles.watchlistItems}>
           {watchlists.map(watchlist => (
             <div key={watchlist.id} className={styles.watchlistItem}>
