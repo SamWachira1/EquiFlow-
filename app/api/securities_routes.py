@@ -11,7 +11,6 @@ EODHD_API_KEY = os.getenv('EODHD_API_KEY')
 
 securities_routes = Blueprint('securities', __name__)
 
-@cache.memoize(timeout=3600)
 def fetch_yahoo_style_data(symbol, from_date, to_date, period='d', interval=None):
     try:
         a = from_date.month - 1
@@ -42,7 +41,6 @@ def fetch_yahoo_style_data(symbol, from_date, to_date, period='d', interval=None
     except requests.exceptions.RequestException as e:
         return jsonify({'error': str(e)}), 500
 
-@cache.memoize(timeout=3600)
 def fetch_fundamental_data(symbol):
     try:
         url = f'https://eodhd.com/api/fundamentals/{symbol}?api_token={EODHD_API_KEY}&fmt=json'
@@ -52,7 +50,6 @@ def fetch_fundamental_data(symbol):
     except requests.exceptions.RequestException as e:
         return jsonify({'error': str(e)}), 500
 
-@cache.memoize(timeout=60)  # Real-time data should be refreshed frequently
 def fetch_real_time_data(symbol):
     try:
         url = f'https://eodhd.com/api/real-time/{symbol}?api_token={EODHD_API_KEY}&fmt=json'
@@ -63,51 +60,60 @@ def fetch_real_time_data(symbol):
         return jsonify({'error': str(e)}), 500
 
 @securities_routes.route('/historical/1d/<symbol>', methods=['GET'])
+@cache.memoize(timeout=300)  # Cache for 5 minutes
 def get_1d_data(symbol):
     today = datetime.now()
     yesterday = today - timedelta(days=1)
     return fetch_yahoo_style_data(symbol, yesterday, today, period='d', interval='1m')
 
 @securities_routes.route('/historical/1w/<symbol>', methods=['GET'])
+@cache.memoize(timeout=3600)  # Cache for 1 hour
 def get_1w_data(symbol):
     today = datetime.now()
     one_week_ago = today - timedelta(days=7)
     return fetch_yahoo_style_data(symbol, one_week_ago, today)
 
 @securities_routes.route('/historical/1m/<symbol>', methods=['GET'])
+@cache.memoize(timeout=86400)  # Cache for 1 day
 def get_1m_data(symbol):
     today = datetime.now()
     one_month_ago = today - timedelta(days=30)
     return fetch_yahoo_style_data(symbol, one_month_ago, today)
 
 @securities_routes.route('/historical/3m/<symbol>', methods=['GET'])
+@cache.memoize(timeout=259200)  # Cache for 3 days
 def get_3m_data(symbol):
     today = datetime.now()
     three_months_ago = today - timedelta(days=90)
     return fetch_yahoo_style_data(symbol, three_months_ago, today)
 
 @securities_routes.route('/historical/ytd/<symbol>', methods=['GET'])
+@cache.memoize(timeout=604800)  # Cache for 7 days
 def get_ytd_data(symbol):
     today = datetime.now()
     start_of_year = datetime(today.year, 1, 1)
     return fetch_yahoo_style_data(symbol, start_of_year, today)
 
 @securities_routes.route('/historical/1y/<symbol>', methods=['GET'])
+@cache.memoize(timeout=1209600)  # Cache for 14 days
 def get_1y_data(symbol):
     today = datetime.now()
     one_year_ago = today - timedelta(days=365)
     return fetch_yahoo_style_data(symbol, one_year_ago, today)
 
 @securities_routes.route('/historical/5y/<symbol>', methods=['GET'])
+@cache.memoize(timeout=2592000)  # Cache for 30 days
 def get_5y_data(symbol):
     today = datetime.now()
     five_years_ago = today - timedelta(days=5*365)
     return fetch_yahoo_style_data(symbol, five_years_ago, today)
 
 @securities_routes.route('/fundamentals/<symbol>', methods=['GET'])
+@cache.memoize(timeout=86400)  # Cache for 1 day
 def get_fundamentals(symbol):
     return fetch_fundamental_data(symbol)
 
 @securities_routes.route('/real-time/<symbol>', methods=['GET'])
+@cache.memoize(timeout=60)  # Real-time data should be refreshed frequently
 def get_real_time(symbol):
     return fetch_real_time_data(symbol)
