@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -15,7 +15,6 @@ import {
   clearFundamentalData,
   clearRealTimeData,
 } from '../../redux/securities';
-
 import { fetchSearchResults } from '../../redux/search';
 import { buyHoldingThunk, sellHoldingThunk, getHoldingsThunk } from '../../redux/holdings';
 import { thunkAuthenticate } from '../../redux/session'; // Import the authentication thunk
@@ -24,7 +23,7 @@ import LoadingSpinner from '../LoadingSpinner';
 import { useModal } from '../../context/Modal';
 import WatchlistModal from '../WatchlistModal/WatchlistModal';
 import SecurityNotFound from '../SecurityNotFound';
-
+import Comments from '../Comments';
 import styles from './SecuritiesPage.module.css';
 
 const SecuritiesPage = () => {
@@ -280,6 +279,7 @@ const SecuritiesPage = () => {
               {buttonText}
             </button>
           </div>
+          <Comments securitySymbol={symbol} /> {/* Integrate Comments component */}
         </div>
       </div>
     ) : null

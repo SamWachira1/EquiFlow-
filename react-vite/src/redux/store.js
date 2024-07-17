@@ -10,13 +10,15 @@ import searchReducer from "./search";
 import securitiesReducer from "./securities";
 import watchlistReducer from "./watchlist";
 import holdingsReducer from "./holdings";
+import commentsReducer from "./comments";
 
 const rootReducer = combineReducers({
   session: sessionReducer,
   search: searchReducer,
   securities: securitiesReducer,
   watchlist: watchlistReducer,
-  holdings: holdingsReducer
+  holdings: holdingsReducer,
+  comments: commentsReducer
 
 });
 
