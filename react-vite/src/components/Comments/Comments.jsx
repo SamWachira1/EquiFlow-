@@ -79,17 +79,24 @@ const Comments = ({ securitySymbol }) => {
                                     </>
                                 ) : (
                                     <>
-                                        <span>{comment.content}</span>
-                                        <button onClick={() => {
-                                            setEditId(comment.id);
-                                            setEditContent(comment.content);
-                                            setError('');
-                                        }}>
-                                            <FaEdit />
-                                        </button>
-                                        <button onClick={() => handleDelete(comment.id)}>
-                                            <FaTrash />
-                                        </button>
+                                        <div className={styles.commentContent}>
+                                            <span className={styles.commentText}>{comment.content}</span>
+                                            <span className={styles.commentMeta}>
+                                                {comment.username} - {new Date(comment.created_at).toLocaleString()}
+                                            </span>
+                                        </div>
+                                        <div className={styles.commentActions}>
+                                            <button onClick={() => {
+                                                setEditId(comment.id);
+                                                setEditContent(comment.content);
+                                                setError('');
+                                            }}>
+                                                <FaEdit />
+                                            </button>
+                                            <button onClick={() => handleDelete(comment.id)}>
+                                                <FaTrash />
+                                            </button>
+                                        </div>
                                     </>
                                 )}
                             </li>
