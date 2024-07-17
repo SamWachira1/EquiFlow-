@@ -169,6 +169,10 @@ const SecuritiesPage = () => {
       setErrorMessage('You cannot sell more shares than you have.');
       return;
     }
+    if (orderType === 'buy' && amount > parseFloat(buyingPower)) {
+      setErrorMessage('Insufficient funds. Add buying power.');
+      return;
+    }
     setShowBuyingPowerMessage(true);
     setErrorMessage(''); // Clear error message
   };
@@ -182,6 +186,11 @@ const SecuritiesPage = () => {
     }
     if (orderType === 'sell' && amount > availableShares) {
       setErrorMessage('You cannot sell more shares than you have.');
+      return;
+    }
+
+    if (orderType === 'buy' && amount > parseFloat(buyingPower)) {
+      setErrorMessage('Insufficient funds. Add buying power.');
       return;
     }
     
@@ -259,39 +268,43 @@ const SecuritiesPage = () => {
           </div>
         </div>
         <div className={styles.rightColumn}>
-          <div className={styles.orderSection}>
-            <h2>{orderType === 'buy' ? 'Buy' : 'Sell'} {general.Name}</h2>
-            <form onSubmit={showBuyingPowerMessage ? handleSubmitOrder : handleReviewOrder}>
-              <label>Order Type</label>
-              <select value={orderType} onChange={(e) => setOrderType(e.target.value)}>
-                <option value="buy">Buy Order</option>
-                <option value="sell">Sell Order</option>
-              </select>
-              <label>{orderType === 'buy' ? 'Amount in Dollars' : 'Amount in Shares'}</label>
-              <input 
-                type="number" 
-                placeholder="0.00" 
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-              />
-              {errorMessage && <p className={styles.error}>{errorMessage}</p>}
-              <p>{orderType === 'buy' ? `Est. Quantity: ${estQuantity}` : `Available Shares: ${availableShares}`}</p>
-              <button type="submit">{showBuyingPowerMessage ? 'Submit Order' : 'Review Order'}</button>
-            </form>
-            {showBuyingPowerMessage && (
-              <p className={styles.buyingPowerMessage}>${buyingPower} buying power available</p>
-            )}
+          <div className={styles.stickyContainer}>
+            <div className={styles.orderSection}>
+              <h2>{orderType === 'buy' ? 'Buy' : 'Sell'} {general.Name}</h2>
+              <form onSubmit={showBuyingPowerMessage ? handleSubmitOrder : handleReviewOrder}>
+                <label>Order Type</label>
+                <select value={orderType} onChange={(e) => setOrderType(e.target.value)}>
+                  <option value="buy">Buy Order</option>
+                  <option value="sell">Sell Order</option>
+                </select>
+                <label>{orderType === 'buy' ? 'Amount in Dollars' : 'Amount in Shares'}</label>
+                <input 
+                  type="number" 
+                  placeholder="0.00" 
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                />
+                {errorMessage && <p className={styles.error}>{errorMessage}</p>}
+                <p>{orderType === 'buy' ? `Est. Quantity: ${estQuantity}` : `Available Shares: ${availableShares}`}</p>
+                <button type="submit">{showBuyingPowerMessage ? 'Submit Order' : 'Review Order'}</button>
+              </form>
+              {showBuyingPowerMessage && (
+                <p className={styles.buyingPowerMessage}>${buyingPower} buying power available</p>
+              )}
+            </div>
+            <div className={styles.watchlistButtonContainer}>
+              <button 
+                onClick={openWatchlistModal} 
+                className={styles.addToWatchlistButton} 
+                disabled={isAdded}
+              >
+                {buttonText}
+              </button>
+            </div>
+            <div className={styles.commentsSection}>
+              <Comments securitySymbol={symbol} /> {/* Integrate Comments component */}
+            </div>
           </div>
-          <div className={styles.watchlistButtonContainer}>
-            <button 
-              onClick={openWatchlistModal} 
-              className={styles.addToWatchlistButton} 
-              disabled={isAdded}
-            >
-              {buttonText}
-            </button>
-          </div>
-          <Comments securitySymbol={symbol} /> {/* Integrate Comments component */}
         </div>
       </div>
     ) : null

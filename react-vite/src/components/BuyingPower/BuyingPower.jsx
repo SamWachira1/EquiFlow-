@@ -1,4 +1,3 @@
-// src/components/BuyingPower.js
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { thunkUpdateBuyingPower } from '../../redux/session';
@@ -13,13 +12,17 @@ const BuyingPower = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleDeposit = () => {
-    const amount = parseFloat(depositAmount.trim());
-    if (!isNaN(amount) && amount > 0) {
+    const amountStr = depositAmount.trim();
+    const amount = parseFloat(amountStr);
+
+    if (amountStr === '' || isNaN(amountStr)) {
+      setErrorMessage('*Please enter deposit amount');
+    } else if (amount <= 0) {
+      setErrorMessage('*Please enter a positive deposit amount');
+    } else {
       dispatch(thunkUpdateBuyingPower(amount));
       setDepositAmount('');
       setErrorMessage('');
-    } else {
-      setErrorMessage('*Please enter deposit amount');
     }
   };
 
@@ -53,6 +56,7 @@ const BuyingPower = () => {
                 value={depositAmount}
                 onChange={(e) => setDepositAmount(e.target.value)}
                 placeholder="Deposit amount"
+                min="0" // Prevent negative values
               />
               <button onClick={handleDeposit}>Deposit funds</button>
             </div>

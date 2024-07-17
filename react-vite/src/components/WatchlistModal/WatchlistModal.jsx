@@ -108,7 +108,7 @@ function WatchlistModal({ onClose, stock }) {
         </div>
         <div className={styles.modalActions}>
           <button onClick={handleSubmit} disabled={isAdded}>
-            {isAdded ? '✓ Added to Watchlist' : 'Save Changes'}
+            {isAdded ? '✓ Added to Watchlist' : 'Finish'}
           </button>
           <button onClick={() => onClose(null)}>Close</button>
         </div>
