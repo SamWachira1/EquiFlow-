@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useCallback } from 'react';
+// src/pages/SecuritiesPage/SecuritiesPage.jsx
+import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -24,6 +25,7 @@ import { useModal } from '../../context/Modal';
 import WatchlistModal from '../WatchlistModal/WatchlistModal';
 import SecurityNotFound from '../SecurityNotFound';
 import Comments from '../Comments';
+import LottieComponent from '../LottieComponent';
 import styles from './SecuritiesPage.module.css';
 
 const SecuritiesPage = () => {
@@ -55,7 +57,7 @@ const SecuritiesPage = () => {
       await dispatch(fetchHistoricalData1D(symbol)); // Fetch 1D data by default
       await dispatch(fetchFundamentalData(symbol));
       await dispatch(fetchRealTimeData(symbol));
-      await dispatch(fetchSearchResults(symbol))
+      await dispatch(fetchSearchResults(symbol));
 
       setLoadingChart(false);
       setLoadingData(false);
@@ -201,10 +203,12 @@ const SecuritiesPage = () => {
     return <LoadingSpinner />;
   }
 
-  if (!general.Name || closePrice==='NA'|| closePrice === '-') {
+  if (!general.Name || closePrice === 'NA' || closePrice === '-') {
     return <SecurityNotFound />;
   }
-  
+
+  const shouldRenderLottie = (data) => Array.isArray(data) && data.length === 0;
+
   return (
     user ? (
       <div className={styles.securitiesPage}>
@@ -215,7 +219,15 @@ const SecuritiesPage = () => {
             <p>{changePercentage}%</p>
           </div>
           <div className={styles.chartContainer}>
-            {loadingChart ? <LoadingSpinner /> : <RechartsAreaChart data={historicalData[period]} />}
+            {loadingChart ? (
+              <LoadingSpinner />
+            ) : shouldRenderLottie(historicalData[period]) ? (
+              <>
+                <LottieComponent />
+              </>
+            ) : (
+              <RechartsAreaChart data={historicalData[period]} />
+            )}
           </div>
           <div className={styles.periodButtons}>
             <button onClick={() => setPeriod('1d')} disabled={loadingChart}>{loadingChart && period === '1d' ? 'Loading...' : '1D'}</button>
