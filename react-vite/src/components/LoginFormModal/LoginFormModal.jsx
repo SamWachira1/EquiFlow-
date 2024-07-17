@@ -29,6 +29,24 @@ function LoginFormModal() {
     }
   };
 
+  const handleDemoLogin = async () => {
+    const demoEmail = "demo@aa.io";
+    const demoPassword = "password";
+
+    const serverResponse = await dispatch(
+      thunkLogin({
+        email: demoEmail,
+        password: demoPassword,
+      })
+    );
+
+    if (serverResponse) {
+      setErrors(serverResponse);
+    } else {
+      closeModal();
+    }
+  };
+
   const handleClickOutside = (event) => {
     if (modalRef.current && !modalRef.current.contains(event.target)) {
       closeModal();
@@ -70,6 +88,9 @@ function LoginFormModal() {
             {errors.password && <p className={styles.error}>{errors.password}</p>}
           </div>
           <button type="submit" className={styles.submitButton}>Log In</button>
+          <button type="button" className={styles.demoButton} onClick={handleDemoLogin}>
+            Demo User
+          </button>
         </form>
       </div>
     </div>
