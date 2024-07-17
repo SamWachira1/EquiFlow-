@@ -7,6 +7,7 @@ import styles from './Comments.module.css';
 const Comments = ({ securitySymbol }) => {
     const dispatch = useDispatch();
     const comments = useSelector(getMemoizedComments);
+    const user = useSelector((state) => state.session.user); // Assuming user data is stored in session state
     const [content, setContent] = useState('');
     const [editContent, setEditContent] = useState('');
     const [editId, setEditId] = useState(null);
@@ -85,18 +86,20 @@ const Comments = ({ securitySymbol }) => {
                                                 {comment.username} - {new Date(comment.created_at).toLocaleString()}
                                             </span>
                                         </div>
-                                        <div className={styles.commentActions}>
-                                            <button onClick={() => {
-                                                setEditId(comment.id);
-                                                setEditContent(comment.content);
-                                                setError('');
-                                            }}>
-                                                <FaEdit />
-                                            </button>
-                                            <button onClick={() => handleDelete(comment.id)}>
-                                                <FaTrash />
-                                            </button>
-                                        </div>
+                                        {comment.user_id === user.id && (
+                                            <div className={styles.commentActions}>
+                                                <button onClick={() => {
+                                                    setEditId(comment.id);
+                                                    setEditContent(comment.content);
+                                                    setError('');
+                                                }}>
+                                                    <FaEdit />
+                                                </button>
+                                                <button onClick={() => handleDelete(comment.id)}>
+                                                    <FaTrash />
+                                                </button>
+                                            </div>
+                                        )}
                                     </>
                                 )}
                             </li>
