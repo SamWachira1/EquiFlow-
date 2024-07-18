@@ -14,10 +14,20 @@ class Config:
     SQLALCHEMY_ECHO = True
     
     # Redis Cache Configuration
+
+    redis_scheme = 'rediss' if os.getenv('REDIS_USE_TLS', 'False') == 'True' else 'redis'
+    redis_user = os.getenv('REDIS_USER')
+    redis_password = os.getenv('REDIS_PASSWORD')
+    redis_host = os.getenv('REDIS_HOST')
+    redis_port = os.getenv('REDIS_PORT', 6379)
+
+    
     CACHE_TYPE = 'redis'
-    CACHE_REDIS_URL = os.environ.get('REDIS_URL')
-    CACHE_REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD')
-    CACHE_REDIS_DB = 0
-    CACHE_REDIS_HOST = os.environ.get('REDIS_HOST')
-    CACHE_REDIS_PORT = os.environ.get('REDIS_PORT', 6379)
-    CACHE_REDIS_TLS = os.environ.get('REDIS_USE_TLS', 'False') == 'True'
+    REDIS_URL = f"{redis_scheme}://{redis_user}:{redis_password}@{redis_host}:{redis_port}"
+    REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD')
+    REDIS_DB = 0
+    REDIS_HOST = os.environ.get('REDIS_HOST')
+    REDIS_PORT = os.environ.get('REDIS_PORT', 6379)
+    REDIS_USE_TLS = os.environ.get('REDIS_USE_TLS', 'False') == 'True'
+
+   

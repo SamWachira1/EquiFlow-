@@ -19,7 +19,15 @@ print(f"REDIS_USE_TLS: {os.getenv('REDIS_USE_TLS')}")
 print(f"REDIS_URL: {os.getenv('REDIS_URL')}")  # Debugging line
 
 # Get Redis URL from environment variable
-redis_url = os.getenv('REDIS_URL')
+# Construct the Redis URL
+redis_scheme = 'rediss' if os.getenv('REDIS_USE_TLS', 'False') == 'True' else 'redis'
+redis_user = os.getenv('REDIS_USER')
+redis_password = os.getenv('REDIS_PASSWORD')
+redis_host = os.getenv('REDIS_HOST')
+redis_port = os.getenv('REDIS_PORT', 6379)
+
+# Construct the Redis URL
+redis_url = f"{redis_scheme}://{redis_user}:{redis_password}@{redis_host}:{redis_port}"
 print(f"REDIS_URL: {redis_url}")  # Debugging line
 
 try:
