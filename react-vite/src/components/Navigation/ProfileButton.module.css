@@ -4,21 +4,32 @@
   align-items: center;
 }
 
+.buttonWrapper {
+  margin: 0 10px;
+  list-style: none; /* Remove bullet points */
+}
+
 .button {
   margin: 0 10px;
-  padding: 5px 10px;
-  border: none;
-  border-radius: 3px;
-  background-color: #00c806;
-  color: #fff;
+  padding: 10px 20px;
+  border: 1px solid #00c806;
+  border-radius: 25px;
+  background-color: white;
+  color: #00c806;
   cursor: pointer;
   font-size: 14px;
+  text-decoration: none;
+  transition: all 0.3s ease;
 }
 
 .button:hover {
-  background-color: red;
+  background-color: #00c806;
+  color: white;
+  box-shadow: 0 4px 8px rgba(0, 200, 6, 0.3); /* Add shadow on hover */
+  transform: scale(1.05); /* Slightly increase size on hover */
 }
 
-.buttonWrapper {
-  margin: 0 10px;
+.button:active {
+  transform: scale(0.95); /* Slightly decrease size on click */
+  box-shadow: 0 2px 4px rgba(0, 200, 6, 0.2); /* Adjust shadow on click */
 }

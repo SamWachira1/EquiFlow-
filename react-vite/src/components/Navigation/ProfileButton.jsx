@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { thunkLogout } from "../../redux/session";
-import OpenModalMenuItem from "./OpenModalMenuItem";
+// import OpenModalMenuItem from "./OpenModalMenuItem";
+import OpenModalButton from "../OpenModalButton/OpenModalButton";
 import LoginFormModal from "../LoginFormModal";
 import SignupFormModal from "../SignupFormModal";
 import styles from './ProfileButton.module.css'
@@ -21,17 +22,17 @@ function ProfileButton() {
       ) : (
         <>
           <div className={styles.buttonWrapper}>
-            <OpenModalMenuItem
-              itemText="Log In"
+            <OpenModalButton
+              buttonText="Log In"
               modalComponent={<LoginFormModal />}
-              className={styles.button}
+              buttonClass={styles.button}
             />
           </div>
           <div className={styles.buttonWrapper}>
-            <OpenModalMenuItem
-              itemText="Sign Up"
+            <OpenModalButton
+              buttonText="Sign Up"
               modalComponent={<SignupFormModal />}
-              className={styles.button}
+              buttonClass={styles.button}
             />
           </div>
         </>
@@ -39,5 +40,6 @@ function ProfileButton() {
     </div>
   );
 }
+
 
 export default ProfileButton;
