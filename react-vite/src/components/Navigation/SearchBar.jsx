@@ -1,9 +1,9 @@
 import { FaSearch } from 'react-icons/fa';
 import { useState } from 'react';
-import styles from './SearchBar.module.css'
+import styles from './SearchBar.module.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
-import { fetchSearchResults, fetchSelectedSecurityDetails} from '../../redux/search';
+import { fetchSearchResults, fetchSelectedSecurityDetails } from '../../redux/search';
 import { useNavigate } from 'react-router-dom';
 
 function SearchBar() {
@@ -12,7 +12,7 @@ function SearchBar() {
     const navigate = useNavigate();
     const { results } = useSelector((state) => state.search);
     const user = useSelector((state) => state.session.user);
-  
+
     useEffect(() => {
         if (query) {
             const timeoutId = setTimeout(() => {
@@ -21,17 +21,17 @@ function SearchBar() {
             return () => clearTimeout(timeoutId);
         }
     }, [query, dispatch]);
-  
+
     const handleSearchChange = (e) => {
         setQuery(e.target.value);
     };
-  
+
     const handleResultClick = async (symbol) => {
         setQuery(''); // Clear the search input
         await dispatch(fetchSelectedSecurityDetails(symbol)); // Fetch and add the security to the database if it doesn't exist
         navigate(`/securities/${symbol}`); // Navigate to the securities page
     };
-  
+
     return (
         user ? (
             <div className={styles.searchContainer}>

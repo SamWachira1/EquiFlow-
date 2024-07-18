@@ -1,34 +1,47 @@
+/* src/components/Navigation.module.css */
+
 .nav {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  background-color: #fff;
   padding: 10px 20px;
-  border-bottom: 1px solid #ddd;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.navList {
+.navLeft, .navCenter, .navRight {
   display: flex;
   align-items: center;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  width: 100%;
 }
 
-.navItem {
-  margin-right: 20px;
-}
-
-.navItem:last-child {
-  margin-left: auto; /* Push the ProfileButton to the right */
-}
-
-.navItem a {
+.navLeft a {
   text-decoration: none;
-  color: black;
-  font-weight: bold;
+  color: #555;
+  padding: 10px 20px;
+  border: 1px solid #ccc;
+  border-radius: 25px;
+  transition: all 0.3s ease;
 }
 
-.navItem a:hover {
-  text-decoration: underline;
+.navLeft a:hover {
+  border-color: #009604; /* Darker green for border color */
+  background-color: #00c806; /* Matching green color */
+  color: white;
+  box-shadow: 0 0 5px rgba(0, 200, 6, 0.5); /* Matching shadow color */
+}
+
+.navCenter {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.navRight {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.welcomeMessage {
+  font-size: 1.2em;
+  color: #333;
 }

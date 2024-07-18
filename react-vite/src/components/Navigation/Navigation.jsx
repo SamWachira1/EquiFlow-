@@ -1,27 +1,34 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import ProfileButton from "./ProfileButton";
 import SearchBar from "./SearchBar";
-import styles from './Navigation.module.css'
+import styles from './Navigation.module.css';
 import LandingPage from "../LandingPage";
 import { useSelector } from "react-redux";
 
 function Navigation() {
   const user = useSelector((state) => state.session.user);
+  const location = useLocation();
+
+  const isHomePage = location.pathname === '/';
+  const isSecurityPage = location.pathname.startsWith('/securities/'); // Adjust based on your route structure
 
   return (
     <>
       <nav className={styles.nav}>
-        <ul className={styles.navList}>
-          <li className={styles.navItem}>
+        <div className={styles.navLeft}>
+          {isHomePage && user && (
+            <span className={styles.welcomeMessage}>Welcome, {user.username}</span>
+          )}
+          {!isHomePage &&  (
             <NavLink to="/">Home</NavLink>
-          </li>
-          <li className={styles.navItem}>
-            <SearchBar />
-          </li>
-          <li className={styles.navItem}>
-            <ProfileButton />
-          </li>
-        </ul>
+          )}
+        </div>
+        <div className={styles.navCenter}>
+          <SearchBar />
+        </div>
+        <div className={styles.navRight}>
+          <ProfileButton />
+        </div>
       </nav>
 
       {!user && <LandingPage />}
