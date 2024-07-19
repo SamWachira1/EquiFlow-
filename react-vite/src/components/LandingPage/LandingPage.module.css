@@ -2,13 +2,20 @@
 
 .landingPage {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
-  align-items: center;
   height: 100vh;
-  padding: 2em;
   font-family: 'Roboto', sans-serif;
   color: #333;
   background-color: white;
+}
+
+.content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
+  padding: 2em;
 }
 
 .leftSection {
@@ -26,22 +33,20 @@
 }
 
 .title {
-    font-size: 35px;
-    position: absolute;
-    animation: fadeIn 1s ease-in-out;
-    background: linear-gradient(to right, #1e3c72, #2a5298, #76b852); /* Updated gradient */
-    -webkit-background-clip: text;
-    color: transparent;
-  
-    margin-left: 2em;
+  font-size: 35px;
+  position: absolute;
+  animation: fadeIn 1s ease-in-out;
+  background: linear-gradient(to right, #1e3c72, #2a5298, #76b852);
+  -webkit-background-clip: text;
+  color: transparent;
+  margin-left: 2em;
 }
 
-
 .logoImage {
-    width: 30em;
-    height: auto;
-    margin-left: 16em;
-    margin-bottom: 5em;
+  width: 30em;
+  height: auto;
+  margin-left: 16em;
+  margin-bottom: 5em;
 }
 
 .rightSection {
@@ -64,7 +69,7 @@
   background-color: #fff;
   padding: 1em;
   border-radius: 10px;
-  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1); /* Less blurred */
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
   opacity: 0;
   animation: fadeIn 1s ease-in-out forwards;
 }

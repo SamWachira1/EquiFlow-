@@ -46,7 +46,7 @@ const SecuritiesPage = () => {
   const { user } = useSelector((state) => state.session);
   const holdings = useSelector((state) => state.holdings.holdings); // Add holdings from state
   const { setModalContent, closeModal } = useModal();
-  const buyingPower = user?.buying_power ? user.buying_power.toFixed(2) : '0.00'; // Round buying power
+  const buyingPower = user?.buying_power ? Math.max(0, parseFloat(user.buying_power.toFixed(2))) : '0.00';
   const securityId = useSelector((state) => state.search?.selectedSecurity?.id);
   const [loadingData, setLoadingData] = useState(true);
 
@@ -179,35 +179,59 @@ const SecuritiesPage = () => {
 
   const handleSubmitOrder = async (e) => {
     e.preventDefault();
-    
-    if (amount <= 0) {
-      setErrorMessage('Amount must be greater than zero.');
-      return;
-    }
-    if (orderType === 'sell' && amount > availableShares) {
-      setErrorMessage('You cannot sell more shares than you have.');
-      return;
-    }
-
-    if (orderType === 'buy' && amount > parseFloat(buyingPower)) {
-      setErrorMessage('Insufficient funds. Add buying power.');
-      return;
-    }
-    
+  
     const parsedAmount = parseFloat(amount);
     const parsedEstQuantity = parseFloat(estQuantity);
     const parsedClosePrice = parseFloat(closePrice);
+    const currentBuyingPower = parseFloat(buyingPower);
+  
+    if (parsedAmount <= 0) {
+      setErrorMessage('Amount must be greater than zero.');
+      return;
+    }
+  
+    if (orderType === 'sell' && parsedAmount > availableShares) {
+      setErrorMessage('You cannot sell more shares than you have.');
+      return;
+    }
   
     if (orderType === 'buy') {
+      if (parsedAmount > currentBuyingPower) {
+        setErrorMessage('Insufficient funds. Add buying power.');
+        return;
+      }
+  
+      // Ensure buying power does not go negative
+      let remainingBuyingPower = currentBuyingPower - parsedAmount;
+      remainingBuyingPower = Math.max(0, parseFloat(remainingBuyingPower.toFixed(2))); // Prevent negative zero
+  
+      if (remainingBuyingPower < 0) {
+        setErrorMessage('Buying power cannot go negative.');
+        return;
+      }
+  
       await dispatch(buyHoldingThunk(symbol, general.Name, parsedEstQuantity, parsedClosePrice));
+  
+      // Update buying power after purchase
+      await dispatch(thunkAuthenticate()); // Refresh user data
+      setShowBuyingPowerMessage(false); // Reset the buying power message display
+      setErrorMessage(''); // Clear any error messages
+      setAmount(''); // Clear the input field
     } else if (orderType === 'sell') {
       await dispatch(sellHoldingThunk(symbol, parsedAmount, parsedClosePrice));
+  
+      // Update buying power after sale
+      await dispatch(thunkAuthenticate()); // Refresh user data
+      setShowBuyingPowerMessage(false); // Reset the buying power message display
+      setErrorMessage(''); // Clear any error messages
+      setAmount(''); // Clear the input field
     }
-
-    await dispatch(thunkAuthenticate()); // Refresh user data
+  
     getHoldings(); // Refresh holdings data
   };
-
+  
+  
+  
   if (loadingData) {
     return <LoadingSpinner />;
   }

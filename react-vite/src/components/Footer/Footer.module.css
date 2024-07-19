@@ -1,0 +1,44 @@
+.footer {
+    background-color: #f8f9fa;
+    padding: 20px 0;
+    text-align: center;
+  }
+  
+  .footerContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .footerText {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: #333;
+  }
+  
+  .footerLinks {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .footerLink {
+    text-decoration: none;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    margin: 0 10px;
+  }
+  
+  .footerLink:hover {
+    color: #0056b3;
+  }
+  
+  .footerLink .githubIcon {
+    color: #333; /* GitHub original color */
+  }
+  
+  .footerLink .linkedinIcon {
+    color: #0077b5; /* LinkedIn original color */
+  }
+  

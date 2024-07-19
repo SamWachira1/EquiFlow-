@@ -26,6 +26,8 @@ const BuyingPower = () => {
     }
   };
 
+  const formattedBuyingPower = user?.buying_power ? Math.max(0, parseFloat(user.buying_power.toFixed(2))).toLocaleString() : '0.00';
+
   return (
     user ? (
       <div className={styles.buyingPower}>
@@ -35,7 +37,7 @@ const BuyingPower = () => {
             <FaInfoCircle className={styles.infoIcon} />
           </div>
           <div className={styles.headerRight}>
-            <span className={styles.amount}>${user.buying_power.toLocaleString()}</span>
+            <span className={styles.amount}>${formattedBuyingPower}</span>
             {isDropdownOpen ? <FaChevronUp className={styles.icon} /> : <FaChevronDown className={styles.icon} />}
           </div>
         </div>
@@ -43,11 +45,11 @@ const BuyingPower = () => {
           <div className={styles.dropdown}>
             <div className={styles.info}>
               <div>Individual cash</div>
-              <div>${user.buying_power.toLocaleString()}</div>
+              <div>${formattedBuyingPower}</div>
             </div>
             <div className={styles.total}>
               <div>Total</div>
-              <div>${user.buying_power.toLocaleString()}</div>
+              <div>${formattedBuyingPower}</div>
             </div>
             {errorMessage && <div className={styles.error}>{errorMessage}</div>}
             <div className={styles.actions}>
