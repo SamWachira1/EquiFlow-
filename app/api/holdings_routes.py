@@ -130,7 +130,7 @@ def create_holding():
 def sell_holding():
     data = request.get_json()
     stock_symbol = data.get('stock_symbol')
-    shares_to_sell = data.get('shares')
+    shares_to_sell = round(data.get('shares'), 2)
     sell_price = data.get('sell_price')
 
     try:
@@ -142,7 +142,7 @@ def sell_holding():
         stock_id = stock.id
 
         holding = Holding.query.filter_by(user_id=current_user.id, security_id=stock_id).first()
-        if not holding or holding.shares < shares_to_sell:
+        if not holding or round(holding.shares, 2) < shares_to_sell:
             return jsonify({'error': 'Not enough shares to sell'}), 400
 
         est = pytz.timezone('US/Eastern')
@@ -160,10 +160,14 @@ def sell_holding():
         db.session.add(transaction)
 
         # Update the holding
-        holding.shares -= shares_to_sell
+        holding.shares = round(holding.shares - shares_to_sell, 2)
         if holding.shares == 0:
             db.session.delete(holding)
-        current_user.buying_power += shares_to_sell * sell_price
+        
+        # Update the buying power and ensure it does not go below zero
+        new_buying_power = current_user.buying_power + shares_to_sell * sell_price
+        current_user.buying_power = round(max(new_buying_power, 0), 2)
+        
         db.session.commit()
 
         return jsonify({'holding': holding.to_dict(), 'buying_power': current_user.buying_power}), 200
@@ -171,6 +175,8 @@ def sell_holding():
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
+
 
 
 @holding_routes.route('/combined_historical_data_1w', methods=['GET'])
