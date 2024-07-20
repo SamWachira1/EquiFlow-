@@ -75,8 +75,8 @@ def create_holding():
     data = request.get_json()
     stock_symbol = data.get('stock_symbol')
     stock_name = data.get('stock_name')
-    shares = data.get('shares')
-    purchase_price = data.get('purchase_price')
+    shares = float(data.get('shares'))
+    purchase_price = float(data.get('purchase_price'))
 
     est = pytz.timezone('US/Eastern')
     purchase_date = datetime.now(est)
@@ -117,10 +117,11 @@ def create_holding():
         )
         db.session.add(transaction)
 
-        current_user.buying_power -= shares * purchase_price
+        current_user.buying_power -= round(shares * purchase_price, 2)
+        if current_user.buying_power < 0:
+            current_user.buying_power = 0.00
         db.session.commit()
-        return jsonify({'holding': holding.to_dict(), 'buying_power': current_user.buying_power}), 201
-
+        return jsonify({'holding': holding.to_dict(), 'buying_power': current_user.buying_power}), 201 
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
