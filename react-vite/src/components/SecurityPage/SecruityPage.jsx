@@ -17,7 +17,7 @@ import {
 } from '../../redux/securities';
 import { fetchSearchResults } from '../../redux/search';
 import { buyHoldingThunk, sellHoldingThunk, getHoldingsThunk } from '../../redux/holdings';
-import { thunkAuthenticate, thunkUpdateBuyingPower } from '../../redux/session'; // Import the new thunk
+import { thunkAuthenticate } from '../../redux/session'; // Import the new thunk
 import RechartsAreaChart from '../SecruityPageChart/Recharts';
 import LoadingSpinner from '../LoadingSpinner';
 import { useModal } from '../../context/Modal';
@@ -48,8 +48,6 @@ const SecuritiesPage = () => {
   const [buyingPower, setBuyingPower] = useState(user?.buying_power ? Math.max(0, parseFloat(user.buying_power.toFixed(2))) : '0.00');
   const securityId = useSelector((state) => state.search?.selectedSecurity?.id);
   const [loadingData, setLoadingData] = useState(true);
-
-  console.log(user.buying_power)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -196,6 +194,7 @@ const SecuritiesPage = () => {
   
       let remainingBuyingPower = currentBuyingPower - parsedAmount;
       remainingBuyingPower = Math.max(0, parseFloat(remainingBuyingPower.toFixed(2)));
+      console.log(remainingBuyingPower)
   
       if (remainingBuyingPower < 0) {
         setErrorMessage('Buying power cannot go negative.');
@@ -203,27 +202,25 @@ const SecuritiesPage = () => {
       }
   
       await dispatch(buyHoldingThunk(symbol, general.Name, parsedEstQuantity, parsedClosePrice));
-      dispatch(thunkUpdateBuyingPower(remainingBuyingPower));
-      await dispatch(thunkAuthenticate());
-      setBuyingPower(remainingBuyingPower < 0 ? '0.00' : Math.max(0, parseFloat(remainingBuyingPower.toFixed(2))));
+      await dispatch(thunkAuthenticate()); // Ensure user state is refreshed
+      setBuyingPower(remainingBuyingPower); // Update local state
       setShowBuyingPowerMessage(true);
       setErrorMessage('');
       setAmount('');
     } 
-
+  
     if (orderType === 'sell') {
       await dispatch(sellHoldingThunk(symbol, parsedAmount, parsedClosePrice));
-      await dispatch(thunkUpdateBuyingPower(user.buying_power));
-      await dispatch(thunkAuthenticate());
-      setBuyingPower(user.buying_power < 0 ? '0.00' : Math.max(0, parseFloat(user.buying_power.toFixed(2))));
+      await dispatch(thunkAuthenticate()); // Ensure user state is refreshed
+      setBuyingPower(currentBuyingPower + (parsedAmount * parsedClosePrice)); // Update local state
       setShowBuyingPowerMessage(true);
       setErrorMessage('');
       setAmount('');
-      window.location.reload(); // Trigger a full page refresh
     }
   
     dispatch(getHoldingsThunk());
   };
+  
   
   if (loadingData) {
     return <LoadingSpinner />;
@@ -332,7 +329,7 @@ const SecuritiesPage = () => {
                 <button type="submit">{showBuyingPowerMessage ? 'Submit Order' : 'Review Order'}</button>
               </form>
               {showBuyingPowerMessage && (
-                <p className={styles.buyingPowerMessage}>${user.buying_power < 0 ? '0.00' : user.buying_power.toFixed(2)} buying power available</p>
+                  <p className={styles.buyingPowerMessage}>${user.buying_power < 0 ? '0.00' : user.buying_power.toFixed(2)} buying power available</p>
               )}
             </div>
             <div className={styles.watchlistButtonContainer}>
