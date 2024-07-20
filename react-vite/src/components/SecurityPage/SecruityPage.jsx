@@ -1,5 +1,4 @@
-// src/pages/SecuritiesPage/SecuritiesPage.jsx
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -18,7 +17,7 @@ import {
 } from '../../redux/securities';
 import { fetchSearchResults } from '../../redux/search';
 import { buyHoldingThunk, sellHoldingThunk, getHoldingsThunk } from '../../redux/holdings';
-import { thunkAuthenticate } from '../../redux/session'; // Import the authentication thunk
+import { thunkAuthenticate, thunkUpdateBuyingPower } from '../../redux/session'; // Import the new thunk
 import RechartsAreaChart from '../SecruityPageChart/Recharts';
 import LoadingSpinner from '../LoadingSpinner';
 import { useModal } from '../../context/Modal';
@@ -39,22 +38,24 @@ const SecuritiesPage = () => {
   const [orderType, setOrderType] = useState('buy');
   const [buttonText, setButtonText] = useState('Add to Watch List');
   const [isAdded, setIsAdded] = useState(false);
-  const [availableShares, setAvailableShares] = useState(0); // Add state for available shares
-  const [errorMessage, setErrorMessage] = useState(''); // State for error message
+  const [availableShares, setAvailableShares] = useState(0);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const { historicalData, fundamentalData, realTimeData } = useSelector((state) => state.securities);
-  const { user } = useSelector((state) => state.session);
-  const holdings = useSelector((state) => state.holdings.holdings); // Add holdings from state
+  const user = useSelector((state) => state.session.user);
+  const holdings = useSelector((state) => state.holdings.holdings);
   const { setModalContent, closeModal } = useModal();
-  const buyingPower = user?.buying_power ? Math.max(0, parseFloat(user.buying_power.toFixed(2))) : '0.00';
+  const [buyingPower, setBuyingPower] = useState(user?.buying_power ? Math.max(0, parseFloat(user.buying_power.toFixed(2))) : '0.00');
   const securityId = useSelector((state) => state.search?.selectedSecurity?.id);
   const [loadingData, setLoadingData] = useState(true);
+
+  console.log(user.buying_power)
 
   useEffect(() => {
     const fetchData = async () => {
       setLoadingChart(true);
       setLoadingData(true);
-      await dispatch(fetchHistoricalData1D(symbol)); // Fetch 1D data by default
+      await dispatch(fetchHistoricalData1D(symbol));
       await dispatch(fetchFundamentalData(symbol));
       await dispatch(fetchRealTimeData(symbol));
       await dispatch(fetchSearchResults(symbol));
@@ -96,24 +97,16 @@ const SecuritiesPage = () => {
     fetchData();
   }, [period, dispatch, symbol]);
 
-  const getHoldings = useCallback(() => {
+  useEffect(() => {
     dispatch(getHoldingsThunk());
   }, [dispatch]);
 
   useEffect(() => {
-    getHoldings();
-  }, [getHoldings]);
-
-  useEffect(() => {
-    const updateAvailableShares = async () => {
-      if (orderType === 'sell' && securityId !== null) {
-        await getHoldings();
-        const holding = holdings.find(h => h.security_id === securityId);
-        setAvailableShares(holding ? holding.shares.toFixed(2) : 0);
-      }
-    };
-    updateAvailableShares();
-  }, [orderType, symbol, securityId, getHoldings]);
+    if (orderType === 'sell' && securityId !== null) {
+      const holding = holdings.find(h => h.security_id === securityId);
+      setAvailableShares(holding ? parseFloat(holding.shares.toFixed(2)) : 0);
+    }
+  }, [orderType, symbol, securityId, holdings]);
 
   const general = fundamentalData.General || {};
   const technicals = fundamentalData.Technicals || {};
@@ -174,7 +167,7 @@ const SecuritiesPage = () => {
       return;
     }
     setShowBuyingPowerMessage(true);
-    setErrorMessage(''); // Clear error message
+    setErrorMessage('');
   };
 
   const handleSubmitOrder = async (e) => {
@@ -201,9 +194,8 @@ const SecuritiesPage = () => {
         return;
       }
   
-      // Ensure buying power does not go negative
       let remainingBuyingPower = currentBuyingPower - parsedAmount;
-      remainingBuyingPower = Math.max(0, parseFloat(remainingBuyingPower.toFixed(2))); // Prevent negative zero
+      remainingBuyingPower = Math.max(0, parseFloat(remainingBuyingPower.toFixed(2)));
   
       if (remainingBuyingPower < 0) {
         setErrorMessage('Buying power cannot go negative.');
@@ -211,26 +203,27 @@ const SecuritiesPage = () => {
       }
   
       await dispatch(buyHoldingThunk(symbol, general.Name, parsedEstQuantity, parsedClosePrice));
-  
-      // Update buying power after purchase
-      await dispatch(thunkAuthenticate()); // Refresh user data
-      setShowBuyingPowerMessage(false); // Reset the buying power message display
-      setErrorMessage(''); // Clear any error messages
-      setAmount(''); // Clear the input field
-    } else if (orderType === 'sell') {
+      dispatch(thunkUpdateBuyingPower(remainingBuyingPower));
+      await dispatch(thunkAuthenticate());
+      setBuyingPower(remainingBuyingPower < 0 ? '0.00' : Math.max(0, parseFloat(remainingBuyingPower.toFixed(2))));
+      setShowBuyingPowerMessage(true);
+      setErrorMessage('');
+      setAmount('');
+    } 
+
+    if (orderType === 'sell') {
       await dispatch(sellHoldingThunk(symbol, parsedAmount, parsedClosePrice));
-  
-      // Update buying power after sale
-      await dispatch(thunkAuthenticate()); // Refresh user data
-      setShowBuyingPowerMessage(false); // Reset the buying power message display
-      setErrorMessage(''); // Clear any error messages
-      setAmount(''); // Clear the input field
+      await dispatch(thunkUpdateBuyingPower(user.buying_power));
+      await dispatch(thunkAuthenticate());
+      setBuyingPower(user.buying_power < 0 ? '0.00' : Math.max(0, parseFloat(user.buying_power.toFixed(2))));
+      setShowBuyingPowerMessage(true);
+      setErrorMessage('');
+      setAmount('');
+      window.location.reload(); // Trigger a full page refresh
     }
   
-    getHoldings(); // Refresh holdings data
+    dispatch(getHoldingsThunk());
   };
-  
-  
   
   if (loadingData) {
     return <LoadingSpinner />;
@@ -241,6 +234,8 @@ const SecuritiesPage = () => {
   }
 
   const shouldRenderLottie = (data) => Array.isArray(data) && data.length === 0;
+  const formatValue = (value) => value !== undefined && value !== null ? value : '-';
+
 
   return (
     user ? (
@@ -275,20 +270,44 @@ const SecuritiesPage = () => {
             <h2>About {general.Name}</h2>
             <p>{general.Description}</p>
             <h2>Key Statistics</h2>
-            <ul>
-              <li>Exchange: {general.Exchange}</li>
-              <li>Country: {general.CountryName}</li>
-              <li>Market Cap: {general.MarketCap}</li>
-              <li>52-Week High: {technicals['52WeekHigh']}</li>
-              <li>52-Week Low: {technicals['52WeekLow']}</li>
-              <li>Day High: {highPrice}</li>
-              <li>Day Low: {lowPrice}</li>
-              <li>Day Open: {openPrice}</li>
-              <li>Volume: {volume}</li>
-              <li>Beta: {technicals.Beta}</li>
-              <li>50-Day Moving Average: {technicals['50DayMA']}</li>
-              <li>200-Day Moving Average: {technicals['200DayMA']}</li>
-            </ul>
+            <div className={styles.keyStatistics}>
+              <div>
+                <span>Market Cap</span>
+                <span>{formatValue(general.MarketCap)}</span>
+              </div>
+              <div>
+                <span>Price-Earnings Ratio</span>
+                <span>{formatValue(technicals.PERatio)}</span>
+              </div>
+              <div>
+                <span>Dividend Yield</span>
+                <span>{formatValue(technicals.DividendYield)}</span>
+              </div>
+              <div>
+                <span>Average Volume</span>
+                <span>{formatValue(volume)}</span>
+              </div>
+              <div>
+                <span>High Today</span>
+                <span>{formatValue(highPrice)}</span>
+              </div>
+              <div>
+                <span>Low Today</span>
+                <span>{formatValue(lowPrice)}</span>
+              </div>
+              <div>
+                <span>Open Price</span>
+                <span>{formatValue(openPrice)}</span>
+              </div>
+              <div>
+                <span>52 Week Low</span>
+                <span>{formatValue(technicals['52WeekLow'])}</span>
+              </div>
+              <div>
+                <span>52 Week High</span>
+                <span>{formatValue(technicals['52WeekHigh'])}</span>
+              </div>
+            </div>
           </div>
         </div>
         <div className={styles.rightColumn}>
@@ -313,7 +332,7 @@ const SecuritiesPage = () => {
                 <button type="submit">{showBuyingPowerMessage ? 'Submit Order' : 'Review Order'}</button>
               </form>
               {showBuyingPowerMessage && (
-                <p className={styles.buyingPowerMessage}>${buyingPower} buying power available</p>
+                <p className={styles.buyingPowerMessage}>${user.buying_power < 0 ? '0.00' : user.buying_power.toFixed(2)} buying power available</p>
               )}
             </div>
             <div className={styles.watchlistButtonContainer}>
@@ -326,7 +345,7 @@ const SecuritiesPage = () => {
               </button>
             </div>
             <div className={styles.commentsSection}>
-              <Comments securitySymbol={symbol} /> {/* Integrate Comments component */}
+              <Comments securitySymbol={symbol} />
             </div>
           </div>
         </div>
