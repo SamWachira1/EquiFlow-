@@ -10,7 +10,6 @@ function Navigation() {
   const location = useLocation();
 
   const isHomePage = location.pathname === '/';
-  const isSecurityPage = location.pathname.startsWith('/securities/'); // Adjust based on your route structure
 
   return (
     <>

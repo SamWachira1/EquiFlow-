@@ -11,6 +11,7 @@ import securitiesReducer from "./securities";
 import watchlistReducer from "./watchlist";
 import holdingsReducer from "./holdings";
 import commentsReducer from "./comments";
+import transactionsReducer from "./transactions";
 
 const rootReducer = combineReducers({
   session: sessionReducer,
@@ -18,7 +19,8 @@ const rootReducer = combineReducers({
   securities: securitiesReducer,
   watchlist: watchlistReducer,
   holdings: holdingsReducer,
-  comments: commentsReducer
+  comments: commentsReducer,
+  transactions: transactionsReducer
 
 });
 

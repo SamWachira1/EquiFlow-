@@ -3,27 +3,28 @@ import { useSelector} from 'react-redux';
 import PortfolioGraph from '../PortfolioChart';
 import PortfolioWatchlists from '../PortfolioWatchlist';
 import BuyingPower from '../BuyingPower';
-import styles from './Holdings.module.css';
+import Transactions from '../Transactions';
+import styles from './PortfolioPage.module.css';
 
 
 const PortfolioPage = () => {
   const user = useSelector((state)=> state.session.user)
 
 
-  return (
-   user ? ( <div className={styles.portfolioPage}>
+  return user ? (
+    <div className={styles.portfolioPage}>
       <div className={styles.leftColumn}>
         <PortfolioGraph />
         <div className={styles.bottomSection}>
           <BuyingPower />
-          {/* Other components like Daily Movers, News */}
+          <Transactions /> 
         </div>
       </div>
       <div className={styles.rightColumn}>
         <PortfolioWatchlists />
       </div>
-    </div>) : null 
-  );
+    </div>
+  ) : null;
 };
 
 export default PortfolioPage;
