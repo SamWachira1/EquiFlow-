@@ -24,6 +24,7 @@ import { useModal } from '../../context/Modal';
 import WatchlistModal from '../WatchlistModal/WatchlistModal';
 import SecurityNotFound from '../SecurityNotFound';
 import Comments from '../Comments';
+import AnalystRatings from '../AnalystRating';
 import LottieComponent from '../LottieComponent';
 import styles from './SecuritiesPage.module.css';
 
@@ -305,6 +306,7 @@ const SecuritiesPage = () => {
                 <span>{formatValue(technicals['52WeekHigh'])}</span>
               </div>
             </div>
+              <AnalystRatings/>
           </div>
         </div>
         <div className={styles.rightColumn}>

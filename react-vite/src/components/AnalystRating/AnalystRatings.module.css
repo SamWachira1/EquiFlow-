@@ -1,0 +1,89 @@
+/* src/components/AnalystRatings.module.css */
+
+.analystRatings {
+    flex: 1 1 31%;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    /* border: 1px solid #ddd; */
+    border-radius: 8px;
+    /* background-color: #f9f9f9; */
+    flex-direction: column;
+  }
+  
+  h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .percentageCircle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 9rem;
+    height: 9rem;
+    border-radius: 50%;
+    background-color: #ebf9ea;
+    color: #00C807;
+    text-align: center;
+    flex-shrink: 0;
+    font-weight: 500;
+  }
+  
+  .ratingsBars {
+    flex-grow: 1;
+    margin-left: 1rem;
+  }
+  
+  .bar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+  
+  .bar span:first-child {
+    width: 50px;
+    flex-shrink: 0;
+  }
+  
+  progress {
+    flex-grow: 1;
+    height: 10px;
+    margin: 0 0.5rem;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  
+  progress::-webkit-progress-bar {
+    background-color: #f3f3f3;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  
+  progress::-webkit-progress-value {
+    border-radius: 5px;
+  }
+  
+  .buy::-webkit-progress-value {
+    background-color: #00C807;
+  }
+  
+  .hold::-webkit-progress-value {
+    background-color: rgb(231, 238, 3);
+  }
+  
+  .sell::-webkit-progress-value {
+    background-color: red;
+  }
+  
+  .bar span:last-child {
+    flex-shrink: 0;
+  }
+  
