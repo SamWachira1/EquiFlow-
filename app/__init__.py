@@ -19,6 +19,7 @@ from .api.watchlist_routes import watchlist_routes
 from .api.holdings_routes import holding_routes
 from .api.transactions_routes import transaction_routes
 from .api.comments_routes import comments_routes
+from .api.news_routes import news_routes
 
 app = Flask(__name__, static_folder='../react-vite/dist', static_url_path='/')
 
@@ -47,6 +48,7 @@ app.register_blueprint(watchlist_routes, url_prefix='/api/watchlists')
 app.register_blueprint(holding_routes, url_prefix='/api/holdings')
 app.register_blueprint(transaction_routes, url_prefix='/api/transactions')
 app.register_blueprint(comments_routes, url_prefix='/api/comments')
+app.register_blueprint(news_routes, url_prefix='/api/news')
 
 db.init_app(app)
 Migrate(app, db)

@@ -12,6 +12,7 @@ import watchlistReducer from "./watchlist";
 import holdingsReducer from "./holdings";
 import commentsReducer from "./comments";
 import transactionsReducer from "./transactions";
+import newsReducer from "./news";
 
 const rootReducer = combineReducers({
   session: sessionReducer,
@@ -20,7 +21,8 @@ const rootReducer = combineReducers({
   watchlist: watchlistReducer,
   holdings: holdingsReducer,
   comments: commentsReducer,
-  transactions: transactionsReducer
+  transactions: transactionsReducer,
+  news: newsReducer
 
 });
 
