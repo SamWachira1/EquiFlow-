@@ -28,8 +28,8 @@
   }
   
   .table th {
-    background-color: #4CAF50;
-    color: white;
+    background-color: #ddddddae;
+    color: black;
   }
   
   .table tbody tr:nth-child(even) {

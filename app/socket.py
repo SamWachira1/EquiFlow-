@@ -1,13 +1,12 @@
+from gevent import monkey
+monkey.patch_all()
+
 import os
 import json
 from flask_socketio import SocketIO, emit
 from websocket import WebSocketApp
 from dotenv import load_dotenv
-from gevent import monkey
 import gevent
-
-# Patch the standard library with gevent
-monkey.patch_all()
 
 # Load environment variables from .env file
 load_dotenv()
@@ -70,5 +69,3 @@ def handle_subscribe_forex(data):
     
     # Run the WebSocket client in a separate greenlet
     gevent.spawn(ws.run_forever)
-
-
