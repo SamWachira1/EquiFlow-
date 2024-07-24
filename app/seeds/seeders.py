@@ -8,8 +8,8 @@ def create_seeder():
 
     ## SEED USERS
     user_list = [
-        {'username':'Demo', 'email':'demo@aa.io', 'buying_power': 10000, 'password':generate_password_hash("password")},
-        {'username':'Sam', 'email':'187swachira@gmail.com', 'buying_power': 10000, 'password':generate_password_hash("password")}
+        {'username':'Demo', 'email':'demo@aa.io', 'password':generate_password_hash("password")},
+        {'username':'Sam', 'email':'187swachira@gmail.com', 'password':generate_password_hash("password")}
 
     ]
 
@@ -17,7 +17,7 @@ def create_seeder():
         user = User(
             username=user_data['username'],
             email=user_data['email'],
-            buying_power=user_data['buying_power'],
+            # buying_power=user_data['buying_power'],
             hashed_password=user_data['password'],
         )
         db.session.add(user)

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getWatchlistDetailsThunk, getWatchlistsThunk } from '../../redux/watchlist';
 import PortfolioWatchlistModal from '../PortfolioWatchlistModal';
-import { FaPlus } from 'react-icons/fa';
+import { FaPlus, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { useModal } from '../../context/Modal';
 import styles from './PortfolioWatchlists.module.css';
 
@@ -16,7 +16,7 @@ const PortfolioWatchlists = () => {
 
   useEffect(() => {
     dispatch(getWatchlistsThunk());
-  }, [dispatch]);
+  }, []);
 
   const toggleWatchlist = async (id) => {
     setExpandedWatchlists((prevState) => ({
@@ -56,7 +56,9 @@ const PortfolioWatchlists = () => {
           <div key={watchlist.id} className={styles.watchlist}>
             <div className={styles.watchlistHeader} onClick={() => toggleWatchlist(watchlist.id)}>
               <h3>{watchlist.name}</h3>
-              <div className={styles.expandIcon}>{expandedWatchlists[watchlist.id] ? '-' : '+'}</div>
+              <div className={styles.expandIcon}>
+                {expandedWatchlists[watchlist.id] ? <FaChevronUp /> : <FaChevronDown />}
+              </div>
             </div>
             {expandedWatchlists[watchlist.id] && (
               loading[watchlist.id] ? (

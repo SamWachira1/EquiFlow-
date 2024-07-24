@@ -29,17 +29,17 @@ const AnalystRatings = () => {
           <div className={styles.bar}>
             <span>Buy</span>
             <progress max="100" value={buyPercentage} className={styles.buy}></progress>
-            <span>{buyPercentage}%</span>
+            <span className={styles.buyPercentage}>{buyPercentage}%</span>
           </div>
           <div className={styles.bar}>
             <span>Hold</span>
             <progress max="100" value={holdPercentage} className={styles.hold}></progress>
-            <span>{holdPercentage}%</span>
+            <span className={styles.holdPercentage}>{holdPercentage}%</span>
           </div>
           <div className={styles.bar}>
             <span>Sell</span>
             <progress max="100" value={sellPercentage} className={styles.sell}></progress>
-            <span>{sellPercentage}%</span>
+            <span className={styles.sellPercentage}>{sellPercentage}%</span>
           </div>
         </div>
       </div>

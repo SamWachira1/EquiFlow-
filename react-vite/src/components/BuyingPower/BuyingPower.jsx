@@ -19,6 +19,8 @@ const BuyingPower = () => {
       setErrorMessage('*Please enter deposit amount');
     } else if (amount <= 0) {
       setErrorMessage('*Please enter a positive deposit amount');
+    } else if (amount > 10000000) {
+      setErrorMessage('*Woah that\'s a lot of money... sorry, the limit deposit amount is $10,000,000');
     } else {
       dispatch(thunkUpdateBuyingPower(amount));
       setDepositAmount('');

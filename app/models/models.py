@@ -14,7 +14,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(40), nullable=False, unique=True)
     email = db.Column(db.String(255), nullable=False, unique=True)
-    buying_power = db.Column(db.Float, nullable=True)
+    buying_power = db.Column(db.Float, nullable=True, default=100000.00)
     hashed_password = db.Column(db.String(255), nullable=False)
 
     holdings = relationship('Holding', backref='user', cascade='all, delete-orphan')

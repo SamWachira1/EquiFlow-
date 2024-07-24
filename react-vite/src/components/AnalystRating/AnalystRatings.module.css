@@ -71,7 +71,7 @@
     border-radius: 5px;
   }
   
-  .buy::-webkit-progress-value {
+  .buy::-webkit-progress-value  {
     background-color: #00C807;
   }
   
@@ -85,5 +85,13 @@
   
   .bar span:last-child {
     flex-shrink: 0;
+  }
+
+  .buyPercentage{
+    font-weight: 500;
+    color: #00C807
+  }
+  .holdPercentage, .sellPercentage {
+    font-weight: 500;
   }
   
