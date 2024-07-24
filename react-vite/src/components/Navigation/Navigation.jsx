@@ -3,6 +3,7 @@ import ProfileButton from "./ProfileButton";
 import SearchBar from "./SearchBar";
 import styles from './Navigation.module.css';
 import LandingPage from "../LandingPage";
+import Ticker from "../Ticker.js";
 import { useSelector } from "react-redux";
 
 function Navigation() {
@@ -29,6 +30,7 @@ function Navigation() {
           <ProfileButton />
         </div>
       </nav>
+      <Ticker/>
 
       {!user && <LandingPage />}
     </>

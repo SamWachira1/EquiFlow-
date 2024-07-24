@@ -41,11 +41,11 @@ def handle_subscribe_forex(data):
     symbols = data['symbols']
     print(f"Subscribed to FOREX symbols: {symbols}")
 
-    ws_url = f'wss://ws.eodhistoricaldata.com/ws/forex?api_token={EODHD_API_KEY}'
+    ws_url = f'wss://ws.eodhistoricaldata.com/ws/crypto?api_token={EODHD_API_KEY}'
 
     def on_message(ws, message):
         print(f"Received message: {message}")
-        socketio.emit('forex_data', message)
+        socketio.emit('crypto_data', message)
 
     def on_error(ws, error):
         print(f"Error: {error}")

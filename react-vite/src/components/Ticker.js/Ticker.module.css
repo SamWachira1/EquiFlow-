@@ -1,0 +1,40 @@
+/* src/components/Ticker.module.css */
+.tickerContainer {
+  width: 100%;
+  background-color: #f8f8f8;
+  border-bottom: 1px solid #ddd;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 10px 0; /* Add some padding to avoid cutting off text */
+  box-sizing: border-box;
+}
+
+.ticker {
+  display: flex;
+  animation: ticker-animation 30s linear infinite;
+}
+
+@keyframes ticker-animation {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.tickerItem {
+  display: inline-block;
+  padding: 0 20px;
+  font-size: 16px;
+  color: #333;
+  white-space: nowrap;
+}
+
+.positive {
+  color: green;
+}
+
+.negative {
+  color: red;
+}

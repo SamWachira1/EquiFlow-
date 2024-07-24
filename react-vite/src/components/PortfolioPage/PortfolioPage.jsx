@@ -5,7 +5,6 @@ import PortfolioWatchlists from '../PortfolioWatchlist';
 import BuyingPower from '../BuyingPower';
 import Transactions from '../Transactions';
 import News from '../News';
-import ForexData from '../ForexData';
 import styles from './PortfolioPage.module.css';
 
 
@@ -27,7 +26,6 @@ const PortfolioPage = () => {
         <div className={styles.rightColumn}>
           <div className={styles.stickyContainer}>
             <PortfolioWatchlists />
-            <ForexData/>
            </div>
          </div>
       </div>
