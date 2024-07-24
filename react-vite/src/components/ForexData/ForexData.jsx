@@ -15,7 +15,7 @@ const ForexData = () => {
       console.log('Connected to server');
 
       // Subscribe to FOREX data
-      const majorSymbols = 'EURUSD, AUDUSD, GBPUSD, USDJPY, USDCAD, USDCHF, NZDUSD';
+      const majorSymbols = 'EURUSD, AUDUSD';
       socket.emit('subscribe_forex', { symbols: majorSymbols });
     });
 

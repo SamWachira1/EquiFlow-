@@ -3,6 +3,11 @@ import json
 from flask_socketio import SocketIO, emit
 from websocket import WebSocketApp
 from dotenv import load_dotenv
+from gevent import monkey
+import gevent
+
+# Patch the standard library with gevent
+monkey.patch_all()
 
 # Load environment variables from .env file
 load_dotenv()
@@ -22,7 +27,7 @@ else:
     origins = "*"
 
 # Initialize SocketIO with CORS allowed origins
-socketios = SocketIO(cors_allowed_origins=origins)
+socketio = SocketIO(cors_allowed_origins=origins)
 
 @socketio.on('connect')
 def handle_connect():
@@ -62,4 +67,8 @@ def handle_subscribe_forex(data):
                       on_message=on_message,
                       on_error=on_error,
                       on_close=on_close)
-    ws.run_forever()
+    
+    # Run the WebSocket client in a separate greenlet
+    gevent.spawn(ws.run_forever)
+
+
