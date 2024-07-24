@@ -1,12 +1,13 @@
-# app/socket.py
 import os
 import json
 from flask_socketio import SocketIO, emit
 from websocket import WebSocketApp
 from dotenv import load_dotenv
 
-load_dotenv()  # Load environment variables from .env file
+# Load environment variables from .env file
+load_dotenv()
 
+# Get EODHD API key from environment variables
 EODHD_API_KEY = os.getenv('EODHD_API_KEY')
 
 # Determine origins based on environment
@@ -20,6 +21,7 @@ if os.environ.get("FLASK_ENV") == "production":
 else:
     origins = "*"
 
+# Initialize SocketIO with CORS allowed origins
 socketio = SocketIO(cors_allowed_origins=origins)
 
 @socketio.on('connect')
@@ -54,6 +56,7 @@ def handle_subscribe_forex(data):
         })
         ws.send(subscribe_message)
 
+    # Create WebSocketApp instance
     ws = WebSocketApp(ws_url,
                       on_open=on_open,
                       on_message=on_message,
