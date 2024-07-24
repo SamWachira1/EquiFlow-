@@ -29,12 +29,11 @@ ENV REDIS_USE_TLS=$REDIS_USE_TLS
 # Construct the Redis URL based on the environment variables
 ENV REDIS_URL=${REDIS_USE_TLS:+rediss}://${REDIS_USER}:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}
 
-
 WORKDIR /var/www
 
 # Copy requirements and install dependencies
 COPY requirements.txt .
-RUN pip install -r requirements.txt && pip install psycopg2
+RUN pip install --no-cache-dir -r requirements.txt && pip install --no-cache-dir psycopg2
 
 # Copy the rest of the application code
 COPY . .
@@ -44,4 +43,4 @@ RUN flask db upgrade
 RUN flask seed all
 
 # Start the application with Gunicorn
-CMD gunicorn --worker-class eventlet -w 1 app:app
+CMD ["gunicorn", "--worker-class", "eventlet", "-w", "1", "app:app"]
