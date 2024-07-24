@@ -22,7 +22,7 @@ else:
     origins = "*"
 
 # Initialize SocketIO with CORS allowed origins
-socketio = SocketIO(cors_allowed_origins=origins)
+socketios = SocketIO(cors_allowed_origins=origins)
 
 @socketio.on('connect')
 def handle_connect():

@@ -9,7 +9,7 @@ from .models import db, User
 from .seeds import seed_commands
 from .config import Config
 from .cache import cache  # Import the cache object
-from .socket import socketio
+from .socket import socketios
 # Register blueprints
 from .api.user_routes import user_routes
 from .api.auth_routes import auth_routes
@@ -53,7 +53,7 @@ app.register_blueprint(news_routes, url_prefix='/api/news')
 
 db.init_app(app)
 Migrate(app, db)
-socketio.init_app(app)
+socketios.init_app(app)
 
 # Application Security
 CORS(app)
