@@ -44,4 +44,4 @@ RUN flask db upgrade
 RUN flask seed all
 
 # Start the application with Gunicorn
-CMD gunicorn app:app
+CMD gunicorn --worker-class eventlet -w 1 app:app
