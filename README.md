@@ -19,7 +19,7 @@ Welcome to EquiFlow, your comprehensive solution for managing and tracking your 
   <img src="https://img.shields.io/badge/Flask-%23000.svg?style=for-the-badge&logo=flask&logoColor=white" alt="Flask" style="width: 120px;">
   <img src="https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white" alt="HTML" style="width: 120px;">
   <img src="https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white" alt="CSS" style="width: 120px;">
-  <img src="https://img.shields.io/badge/WebSocket.io-%23000000.svg?style=for-the-badge&logo=socket.io&logoColor=white" alt="WebSocket.io" style="width: 100px;">
+  <img src="https://img.shields.io/badge/WebSocket.io-%23000000.svg?style=for-the-badge&logo=socket.io&logoColor=white" alt="WebSocket.io" style="width: 120px;">
   <img src="https://img.shields.io/badge/Git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white" alt="GIT" style="width: 120px;">
   <img src="https://img.shields.io/badge/Docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" style="width: 120px;">
 </p>
