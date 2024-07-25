@@ -25,7 +25,7 @@ Welcome to EquiFlow, your comprehensive solution for managing and tracking your 
 
 ## Getting Started
 
-To see HyperComm live, click the link above. To run HyperComm locally on your machine follow these steps:
+To see EquiFlow live, click the link above. To run EquiFlow locally on your machine follow these steps:
 
 - Clone the repository:
 
