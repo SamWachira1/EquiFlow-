@@ -29,7 +29,7 @@ function Navigation() {
         </div>
         <div className={styles.navCenter}>
           <SearchBar />
-          <span onClick={handleReportsClick} className={styles.reportLink}>Reports</span>
+        {isHomePage && user && (<span onClick={handleReportsClick} className={styles.reportLink}>Reports</span>)} 
         </div>
         <div className={styles.navRight}>
           <ProfileButton />
