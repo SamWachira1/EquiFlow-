@@ -1,5 +1,6 @@
 // src/components/Ticker.js
 import { useEffect, useState, useRef } from 'react';
+import {useLocation} from "react-router-dom"
 import { useSelector } from 'react-redux';
 import socketIOClient from 'socket.io-client';
 import styles from './Ticker.module.css'; // Import the CSS module
@@ -10,6 +11,10 @@ const Ticker = () => {
   const [cryptoData, setCryptoData] = useState({});
   const user = useSelector((state) => state.session.user);
   const cryptoDataRef = useRef(cryptoData);
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
+
+
 
   useEffect(() => {
     cryptoDataRef.current = cryptoData;
@@ -49,7 +54,7 @@ const Ticker = () => {
   ));
 
   return (
-    user ? (
+    user && isHomePage ? (
       <div className={styles.tickerContainer}>
         <div className={styles.tickerWrapper}>
           {tickerItems}
