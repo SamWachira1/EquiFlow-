@@ -5,21 +5,22 @@
   border-bottom: 1px solid #ddd;
   overflow: hidden;
   white-space: nowrap;
-  padding: 10px 0; /* Add some padding to avoid cutting off text */
+  padding: 10px 0;
   box-sizing: border-box;
+  position: relative;
 }
 
-.ticker {
+.tickerWrapper {
   display: flex;
-  animation: ticker-animation 50s linear infinite;
+  animation: ticker-animation 15s linear infinite; /* Increase speed by reducing duration */
 }
 
 @keyframes ticker-animation {
   0% {
-    transform: translateX(100%);
+    transform: translateX(0%);
   }
   100% {
-    transform: translateX(-100%);
+    transform: translateX(-50%);
   }
 }
 
@@ -27,11 +28,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 50px; /* Further increase padding to add more space between items */
+  padding: 0 50px;
   font-size: 16px;
   color: #333;
   white-space: nowrap;
-  min-width: 300px; /* Ensure enough room for numbers to update */
+  min-width: 300px;
 }
 
 .positive {

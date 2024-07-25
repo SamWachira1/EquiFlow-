@@ -22,7 +22,7 @@ const Ticker = () => {
       console.log('Connected to server');
 
       // Subscribe to Cryptocurrency data
-      const majorSymbols = 'BTC-USD,ETH-USD,XRP-USD,SOL-USD,DOGE-USD,SHIB-USD,LTC-USD'; // Correct format for cryptocurrencies
+      const majorSymbols = 'BTC-USD,ETH-USD,XRP-USD,SOL-USD,DOGE-USD,SHIB-USD,LTC-USD';
       socket.emit('subscribe_crypto', { symbols: majorSymbols });
     });
 
@@ -42,18 +42,18 @@ const Ticker = () => {
     };
   }, []);
 
-
-
+  const tickerItems = Object.values(cryptoData).map((data) => (
+    <div className={styles.tickerItem} key={data.s}>
+      {data.s}: ${data.p} <span className={data.dc >= 0 ? styles.positive : styles.negative}>{data.dc}%</span>
+    </div>
+  ));
 
   return (
     user ? (
       <div className={styles.tickerContainer}>
-        <div className={styles.ticker}>
-          {Object.values(cryptoData).map((data) => (
-            <div className={styles.tickerItem} key={data.s}>
-              {data.s}: ${data.p} <span className={data.dc >= 0 ? styles.positive : styles.negative}>{data.dc}%</span>
-            </div>
-          ))}
+        <div className={styles.tickerWrapper}>
+          {tickerItems}
+          {tickerItems} {/* Duplicate items to create seamless loop */}
         </div>
       </div>
     ) : null
