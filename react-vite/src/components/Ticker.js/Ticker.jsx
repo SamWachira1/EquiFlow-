@@ -1,6 +1,5 @@
 // src/components/Ticker.js
-import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useEffect, useState, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import socketIOClient from 'socket.io-client';
 import styles from './Ticker.module.css'; // Import the CSS module
@@ -10,10 +9,11 @@ const ENDPOINT = process.env.NODE_ENV === 'production' ? "https://equiflow.onren
 const Ticker = () => {
   const [cryptoData, setCryptoData] = useState({});
   const user = useSelector((state) => state.session.user);
-  const location = useLocation();
-  const isHomePage = location.pathname === '/';
+  const cryptoDataRef = useRef(cryptoData);
 
-
+  useEffect(() => {
+    cryptoDataRef.current = cryptoData;
+  }, [cryptoData]);
 
   useEffect(() => {
     const socket = socketIOClient(ENDPOINT);
@@ -22,15 +22,15 @@ const Ticker = () => {
       console.log('Connected to server');
 
       // Subscribe to Cryptocurrency data
-      const majorSymbols = 'BTC-USD, ETH-USD, LTC-USD, XRP-USD, DOGE-USD';
-      socket.emit('crypto_data', { symbols: majorSymbols });
+      const majorSymbols = 'BTC-USD,ETH-USD,XRP-USD,SOL-USD,DOGE-USD,SHIB-USD,LTC-USD'; // Correct format for cryptocurrencies
+      socket.emit('subscribe_crypto', { symbols: majorSymbols });
     });
 
-    socket.on('crypto_data', (data) => { // Update event name
+    socket.on('crypto_data', (data) => { // Ensure the event name matches
       const parsedData = JSON.parse(data);
       console.log('Received Crypto data:', parsedData);
       if (parsedData && parsedData.s) {
-        setCryptoData((prevData) => ({
+        setCryptoData(prevData => ({
           ...prevData,
           [parsedData.s]: parsedData,
         }));
@@ -42,8 +42,11 @@ const Ticker = () => {
     };
   }, []);
 
+
+
+
   return (
-    user && isHomePage ? (
+    user ? (
       <div className={styles.tickerContainer}>
         <div className={styles.ticker}>
           {Object.values(cryptoData).map((data) => (

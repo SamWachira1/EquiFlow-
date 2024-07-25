@@ -36,16 +36,17 @@ def handle_connect():
 def handle_disconnect():
     print('Client disconnected')
 
-@socketio.on('subscribe_forex')
-def handle_subscribe_forex(data):
+@socketio.on('subscribe_crypto')  # Ensure the event name matches
+def handle_subscribe_crypto(data):
     symbols = data['symbols']
-    print(f"Subscribed to FOREX symbols: {symbols}")
+    print(f"Subscribed to crypto symbols: {symbols}")
 
+    # ws_url = f'wss://ws.eodhistoricaldata.com/ws/forex?api_token={EODHD_API_KEY}'
     ws_url = f'wss://ws.eodhistoricaldata.com/ws/crypto?api_token={EODHD_API_KEY}'
 
     def on_message(ws, message):
-        print(f"Received message: {message}")
-        socketio.emit('crypto_data', message)
+        print(f"Received message: {message}")  # Log the received message
+        socketio.emit('crypto_data', message)  # Ensure the event name matches
 
     def on_error(ws, error):
         print(f"Error: {error}")
@@ -58,6 +59,7 @@ def handle_subscribe_forex(data):
             "action": "subscribe",
             "symbols": symbols
         })
+        print(f"Sending subscribe message: {subscribe_message}")  # Log the subscription message
         ws.send(subscribe_message)
 
     # Create WebSocketApp instance
