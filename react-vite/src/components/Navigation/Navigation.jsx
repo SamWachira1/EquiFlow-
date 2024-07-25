@@ -12,6 +12,10 @@ function Navigation() {
 
   const isHomePage = location.pathname === '/';
 
+  const handleReportsClick = () => {
+    alert('Feature coming soon!');
+  };
+
   return (
     <>
       <nav className={styles.nav}>
@@ -19,12 +23,13 @@ function Navigation() {
           {isHomePage && user && (
             <span className={styles.welcomeMessage}>Welcome, {user.username}</span>
           )}
-          {!isHomePage &&  (
+          {!isHomePage && (
             <NavLink to="/">Home</NavLink>
           )}
         </div>
         <div className={styles.navCenter}>
           <SearchBar />
+          <span onClick={handleReportsClick} className={styles.reportLink}>Reports</span>
         </div>
         <div className={styles.navRight}>
           <ProfileButton />
