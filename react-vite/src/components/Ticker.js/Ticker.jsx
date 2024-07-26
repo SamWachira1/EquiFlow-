@@ -33,7 +33,7 @@ const Ticker = () => {
 
     socket.on('crypto_data', (data) => { // Ensure the event name matches
       const parsedData = JSON.parse(data);
-      console.log('Received Crypto data:', parsedData);
+      // console.log('Received Crypto data:', parsedData);
       if (parsedData && parsedData.s) {
         setCryptoData(prevData => ({
           ...prevData,

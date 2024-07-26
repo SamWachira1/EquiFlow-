@@ -109,6 +109,8 @@ const SecuritiesPage = () => {
 
   const general = fundamentalData.General || {};
   const technicals = fundamentalData.Technicals || {};
+  const highlights = fundamentalData.Highlights || {}
+
   const realTime = realTimeData || {};
 
   const closePrice = realTime.close || technicals.Last || '-';
@@ -271,15 +273,15 @@ const SecuritiesPage = () => {
             <div className={styles.keyStatistics}>
               <div>
                 <span>Market Cap</span>
-                <span>{formatValue(general.MarketCap)}</span>
+                <span>{formatValue(highlights.MarketCapitalizationMln)}</span>
               </div>
               <div>
                 <span>Price-Earnings Ratio</span>
-                <span>{formatValue(technicals.PERatio)}</span>
+                <span>{formatValue(highlights.PERatio)}</span>
               </div>
               <div>
                 <span>Dividend Yield</span>
-                <span>{formatValue(technicals.DividendYield)}</span>
+                <span>{formatValue(highlights.DividendYield)}</span>
               </div>
               <div>
                 <span>Average Volume</span>
