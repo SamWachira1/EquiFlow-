@@ -1,6 +1,6 @@
 # app/__init__.py
 import os
-from flask import Flask, render_template, request, session, redirect
+from flask import Flask, request, session, redirect, send_from_directory
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect, generate_csrf
@@ -104,3 +104,7 @@ def react_root(path):
 @app.errorhandler(404)
 def not_found(e):
     return app.send_static_file('index.html')
+
+@app.route('/google236eaae3a0acab21.html')
+def google_verification():
+    return send_from_directory(app.root_path, 'google236eaae3a0acab21.html')
