@@ -107,4 +107,5 @@ def not_found(e):
 
 @app.route('/google236eaae3a0acab21.html')
 def google_verification():
+    print(f"Serving file from: {app.root_path}")
     return send_from_directory(app.root_path, 'google236eaae3a0acab21.html')
