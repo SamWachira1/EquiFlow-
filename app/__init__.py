@@ -1,6 +1,6 @@
 # app/__init__.py
 import os
-from flask import Flask, request, session, redirect, send_from_directory
+from flask import Flask, request, redirect, send_from_directory
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect, generate_csrf
@@ -9,7 +9,8 @@ from .models import db, User
 from .socket import socketio
 from .seeds import seed_commands
 from .config import Config
-from .cache import cache  # Import the cache object
+from .cache import cache
+from .auth import init_oauth  # Import the init_oauth function from auth
 # Register blueprints
 from .api.user_routes import user_routes
 from .api.auth_routes import auth_routes
@@ -20,6 +21,7 @@ from .api.holdings_routes import holding_routes
 from .api.transactions_routes import transaction_routes
 from .api.comments_routes import comments_routes
 from .api.news_routes import news_routes
+from .api.google_routes import google_auth_routes
 
 
 app = Flask(__name__, static_folder='../react-vite/dist', static_url_path='/')
@@ -38,7 +40,10 @@ app.cli.add_command(seed_commands)
 app.config.from_object(Config)
 
 # Initialize Flask-Caching
-cache.init_app(app)  # Initialize cache with the app
+cache.init_app(app)
+
+# Initialize OAuth
+init_oauth(app)
 
 # Register blueprints
 app.register_blueprint(user_routes, url_prefix='/api/users')
@@ -50,6 +55,7 @@ app.register_blueprint(holding_routes, url_prefix='/api/holdings')
 app.register_blueprint(transaction_routes, url_prefix='/api/transactions')
 app.register_blueprint(comments_routes, url_prefix='/api/comments')
 app.register_blueprint(news_routes, url_prefix='/api/news')
+app.register_blueprint(google_auth_routes, url_prefix='/api/google_auth')
 
 db.init_app(app)
 Migrate(app, db)
