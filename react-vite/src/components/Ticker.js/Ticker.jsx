@@ -14,8 +14,6 @@ const Ticker = () => {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
 
-
-
   useEffect(() => {
     cryptoDataRef.current = cryptoData;
   }, [cryptoData]);
@@ -27,13 +25,12 @@ const Ticker = () => {
       console.log('Connected to server');
 
       // Subscribe to Cryptocurrency data
-      const majorSymbols = 'BTC-USD,ETH-USD,XRP-USD,SOL-USD,DOGE-USD,SHIB-USD,LTC-USD';
+      const majorSymbols = 'BTC-USD,ETH-USD,XRP-USD,SOL-USD,DOGE-USD,LTC-USD';
       socket.emit('subscribe_crypto', { symbols: majorSymbols });
     });
 
-    socket.on('crypto_data', (data) => { // Ensure the event name matches
+    socket.on('crypto_data', (data) => {
       const parsedData = JSON.parse(data);
-      // console.log('Received Crypto data:', parsedData);
       if (parsedData && parsedData.s) {
         setCryptoData(prevData => ({
           ...prevData,
@@ -47,22 +44,24 @@ const Ticker = () => {
     };
   }, []);
 
-  const tickerItems = Object.values(cryptoData).map((data) => (
-    <div className={styles.tickerItem} key={data.s}>
-      {data.s}: ${data.p} <span className={data.dc >= 0 ? styles.positive : styles.negative}>{data.dc}%</span>
-    </div>
-  ));
-
+  // Only render ticker if there's crypto data
   return (
-    user && isHomePage ? (
+    user && isHomePage && Object.keys(cryptoData).length > 0 ? (
       <div className={styles.tickerContainer}>
         <div className={styles.tickerWrapper}>
-          {tickerItems}
-          {tickerItems} {/* Duplicate items to create seamless loop */}
+          {Object.values(cryptoData).map((data) => {
+            const roundedPrice = parseFloat(data.p).toFixed(4); // Round to 4 decimal places
+            return (
+              <div className={styles.tickerItem} key={data.s}>
+                {data.s}: <span className={styles.price}>${roundedPrice}</span>
+                <span className={`${styles.change} ${data.dc >= 0 ? styles.positive : styles.negative}`}>{data.dc}%</span>
+              </div>
+            );
+          })}
         </div>
       </div>
     ) : null
   );
 };
 
-export default Ticker;
+export default Ticker
