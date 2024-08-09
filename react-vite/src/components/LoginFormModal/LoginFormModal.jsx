@@ -2,7 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { thunkLogin } from "../../redux/session";
 import { useDispatch } from "react-redux";
 import { useModal } from "../../context/Modal";
-import styles from './LoginForm.module.css';
+import   
+ styles from './LoginForm.module.css';
+import { v4 as uuidv4 } from 'uuid'; // Import uuid
 
 function LoginFormModal() {
   const dispatch = useDispatch();
@@ -10,7 +12,11 @@ function LoginFormModal() {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
   const { closeModal } = useModal();
-  const modalRef = useRef();
+  const   
+ modalRef = useRef();
+
+  // Generate a unique state value for Google OAuth
+  const state = useRef(uuidv4());
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,7 +31,8 @@ function LoginFormModal() {
     if (serverResponse) {
       setErrors(serverResponse);
     } else {
-      closeModal();
+      closeModal();   
+
     }
   };
 
@@ -47,6 +54,11 @@ function LoginFormModal() {
     }
   };
 
+  const handleGoogleLogin = () => {
+    const googleLoginUrl = `/api/google_auth/google-login?state=${state.current}`;
+    window.location.href = googleLoginUrl;
+  };
+
   const handleClickOutside = (event) => {
     if (modalRef.current && !modalRef.current.contains(event.target)) {
       closeModal();
@@ -54,12 +66,14 @@ function LoginFormModal() {
   };
 
   useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown",   
+ handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);   
+
     };
   }, []);
-
+  
   return (
     <div className={styles.modal}>
       <div className={styles.modalContent} ref={modalRef}>
@@ -90,6 +104,10 @@ function LoginFormModal() {
           <button type="submit" className={styles.submitButton}>Log In</button>
           <button type="button" className={styles.demoButton} onClick={handleDemoLogin}>
             Demo User
+          </button>
+          <button type="button" className={styles.googleButton} onClick={handleGoogleLogin}>
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" className={styles.googleLogo} />
+            Log In with Google
           </button>
         </form>
       </div>

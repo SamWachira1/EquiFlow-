@@ -19,6 +19,11 @@ def password_matches(form, field):
     user = User.query.filter(User.email == email).first()
     if not user:
         raise ValidationError('No such user exists.')
+
+    # Check if user has a password (i.e., not an OAuth user)
+    if user.hashed_password is None:
+        raise ValidationError('This account does not use a password. Please use Google login.')
+
     if not user.check_password(password):
         raise ValidationError('Password was incorrect.')
 

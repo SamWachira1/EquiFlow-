@@ -7,18 +7,21 @@ from werkzeug.security import generate_password_hash
 def create_seeder():
 
     ## SEED USERS
+    ## SEED USERS
     user_list = [
-        {'username':'Demo', 'email':'demo@aa.io', 'password':generate_password_hash("password")},
-        {'username':'Sam', 'email':'187swachira@gmail.com', 'password':generate_password_hash("password")}
-
+        {'username': 'Demo', 'email': 'demo@aa.io', 'password': 'password', 'google_id': None},
+        {'username': 'Sam', 'email': '187swachira@gmail.com', 'password': 'password', 'google_id': None},
+        # Example of a Google OAuth user
+        # {'username': 'GoogleUser', 'email': 'googleuser@example.com', 'password': None, 'google_id': 'google_id_example'}
     ]
 
     for user_data in user_list:
+        hashed_password = generate_password_hash(user_data['password']) if user_data['password'] else None
         user = User(
             username=user_data['username'],
             email=user_data['email'],
-            # buying_power=user_data['buying_power'],
-            hashed_password=user_data['password'],
+            google_id=user_data['google_id'],  # Set google_id if any
+            hashed_password=hashed_password
         )
         db.session.add(user)
     db.session.commit()

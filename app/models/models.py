@@ -15,7 +15,8 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(40), nullable=False, unique=True)
     email = db.Column(db.String(255), nullable=False, unique=True)
     buying_power = db.Column(db.Float, nullable=True, default=100000.00)
-    hashed_password = db.Column(db.String(255), nullable=False)
+    hashed_password = db.Column(db.String(255), nullable=True)  # Allow NULL for OAuth users
+    google_id = db.Column(db.String(255), unique=True, nullable=True)  # Add Google ID
 
     holdings = relationship('Holding', backref='user', cascade='all, delete-orphan')
     transactions = relationship('Transaction', backref='user', cascade='all, delete-orphan')
@@ -39,6 +40,7 @@ class User(db.Model, UserMixin):
             'id': self.id,
             'username': self.username,
             'email': self.email,
+            'google_id': self.google_id,
             'buying_power': self.buying_power
         }
 
